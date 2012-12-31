@@ -3,3 +3,5 @@ Changelog
 
 0.1 (Unreleased)
 ----------------
+
+- first release

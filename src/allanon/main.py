@@ -4,7 +4,7 @@ import os
 
 from optparse import OptionParser
 
-from allanon.url_generator import generate
+from allanon.url_generator import generate_urls
 from allanon.resouce_grabber import ResourceGrabber
 
 VERSION = "0.1"
@@ -37,19 +37,31 @@ parser.add_option('--help', '-h',
                  help='show this help message and exit')
 
 parser.add_option('--search', '-s', dest="search", default=None,
-                  help="Look for this resource inside every URLs and download it.\n"
+                  help="Look for resource inside every URLs and download it instead of the "
+                       "URL itself.\n"
                        "See the pyquery documentation for more info about the query "
                        "format (http://packages.python.org/pyquery/).")
-
 parser.add_option('--directory', '-d', dest="destination_directory", default=os.getcwd(),
                   metavar="TARGET_DIR",
                   help="Directory where to store all resources that will be downloaded.\n"
                        "Default if the current directory")
+parser.add_option('--filename', '-f', dest="filename_model", default=None, metavar="FILENAME",
+                  help="Download resources with a custom, dynamic, filename.\n"
+                       "You can use some marker for creating a dynamic content.\n"
+                       "Use %x (%1, %2, ...) for include the current URLs range "
+                       "(if any). Use %1 for the first range in the URL, %2 for "
+                       "the second, and so on.\n"
+                       "Use %HOST for include the original host where the resource has "
+                       "been downloaded.\n"
+                       "Use %NAME for include the original filename (without extension).\n"
+                       "Use %EXTENSION for include the original file extensions.\n"
+                       "Use %FULLNAME for include the original filename (with extension)\n"
+                       "Default is \"%FULLNAME\"")
 
 
 def get_urls(raw_urls):
     for raw_url in raw_urls:
-        for url in generate(raw_url):
+        for url in generate_urls(raw_url):
             yield url
 
 
@@ -65,11 +77,13 @@ def main():
         print "\n".join(result)
     
     urls = get_urls(args)
-    for url in urls:
+    for index, url in enumerate(urls):
         rg = ResourceGrabber(url)
         if not options.search:
-            rg.download(options.destination_directory)
-
+            rg.download(options.destination_directory, options.filename_model, index+1)
+        else:
+            rg.download_resources(options.search, options.destination_directory,
+                                  options.filename_model, index+1)
 
 if __name__ == '__main__':
     main()

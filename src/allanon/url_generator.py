@@ -7,7 +7,7 @@ SPREAD_MODEL = r"""\{(?P<start>\d+)\:(?P<end>\d+)\}"""
 
 spre = re.compile(SPREAD_MODEL)
 
-def generate(url, level=0):
+def generate_urls(url, level=0):
     """
     Using a string (commonly an URL) that contains a range section like this:
     
@@ -56,8 +56,8 @@ def generate(url, level=0):
             new_url = spre.sub(str(x), url, 1)
             if new_url.find("{")==-1:
                 yield new_url
-            for x in generate(new_url, level+1):
-                yield x
+            for y in generate_urls(new_url, level+1):
+                yield y
     elif level==0:
         # first attempt doesn't match: then I'll return original URL
         yield url
