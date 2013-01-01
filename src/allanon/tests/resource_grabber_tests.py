@@ -63,6 +63,16 @@ class ResourceGrabberDirectDownalodTest(unittest.TestCase):
         self.assertTrue(os.path.exists(path))
         with open(path) as tfile:
             self.assertEqual(tfile.read(), "foo")
+        # another test, playgin with case and whitespaces
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.net/page",
+                           body="foo",
+                           content_disposition="attachment;FILENAME  =\tbar.pdf")
+        rg = ResourceGrabber("http://foo.net/page")
+        rg.download(self.directory)
+        path = os.path.join(self.directory, 'bar.pdf')
+        self.assertTrue(os.path.exists(path))
+        with open(path) as tfile:
+            self.assertEqual(tfile.read(), "foo")
 
     def test_file_exists_error(self):
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.net/foo.pdf",
@@ -73,6 +83,20 @@ class ResourceGrabberDirectDownalodTest(unittest.TestCase):
         f.close()
         self.assertRaises(IOError, rg.download, self.directory)
 
+    def test_generate_filename_from_model(self):
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.net/foo.pdf")
+        rg = ResourceGrabber("http://foo.net/foo.pdf")
+        self.assertEqual(rg._generate_filename_from_model('foo.pdf', 'bar-baz-%FULLNAME'),
+                         'bar-baz-foo.pdf')
+        self.assertEqual(rg._generate_filename_from_model('foo.pdf', 'bar-%NAME-baz.%EXTENSION'),
+                         'bar-foo-baz.pdf')
+        self.assertEqual(rg._generate_filename_from_model('foo.pdf', '%HOST-foo.pdf'),
+                         'foo.net-foo.pdf')
+        self.assertEqual(rg._generate_filename_from_model('foo.pdf', '%INDEX-foo.pdf', index=12),
+                         '12-foo.pdf')
+        self.assertEqual(rg._generate_filename_from_model('foo.pdf', 'foo-%1-bar-%2.pdf',
+                                                          ids=[2, 5]),
+                         '12-foo.pdf')
 
 class ResourceGrabberInnerResourcesTest(unittest.TestCase):
 

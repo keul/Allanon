@@ -42,23 +42,21 @@ def generate_urls(url, level=0):
         foo n+1 bar x baz
         ...
         foo m bar y baz
-    
     """
     
     match = spre.search(url)
     if match:
         start, end = match.groups()
         start = int(start); end = int(end)
-        step = 1
-        if start>end:
-            step = -1
+        step = start<=end and 1 or -1
         for x in xrange(start, end+step, step):
+            ids = [x]
             new_url = spre.sub(str(x), url, 1)
             if new_url.find("{")==-1:
-                yield new_url
-            for y in generate_urls(new_url, level+1):
-                yield y
+                yield new_url, ids
+            for y, inner_ids in generate_urls(new_url, level+1):
+                yield y,  ids + inner_ids
     elif level==0:
         # first attempt doesn't match: then I'll return original URL
-        yield url
+        yield url, []
 

@@ -53,6 +53,7 @@ parser.add_option('--filename', '-f', dest="filename_model", default=None, metav
                        "the second, and so on.\n"
                        "Use %HOST for include the original host where the resource has "
                        "been downloaded.\n"
+                       "Use %INDEX for include a progressive number of downloaded resources.\n"
                        "Use %NAME for include the original filename (without extension).\n"
                        "Use %EXTENSION for include the original file extensions.\n"
                        "Use %FULLNAME for include the original filename (with extension)\n"
@@ -61,8 +62,8 @@ parser.add_option('--filename', '-f', dest="filename_model", default=None, metav
 
 def get_urls(raw_urls):
     for raw_url in raw_urls:
-        for url in generate_urls(raw_url):
-            yield url
+        for url, ids in generate_urls(raw_url):
+            yield url, ids
 
 
 def main():
@@ -76,14 +77,15 @@ def main():
         result.append(parser.format_option_help(parser.formatter))
         print "\n".join(result)
     
-    urls = get_urls(args)
+    urls, ids = get_urls(args)
     for index, url in enumerate(urls):
         rg = ResourceGrabber(url)
         if not options.search:
-            rg.download(options.destination_directory, options.filename_model, index+1)
+            rg.download(options.destination_directory, options.filename_model, ids, index)
         else:
             rg.download_resources(options.search, options.destination_directory,
-                                  options.filename_model, index+1)
+                                  options.filename_model, ids, index)
+
 
 if __name__ == '__main__':
     main()
