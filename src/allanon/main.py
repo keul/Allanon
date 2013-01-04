@@ -37,7 +37,7 @@ parser.add_option('--help', '-h',
                  action="store_true", default=False,
                  help='show this help message and exit')
 
-parser.add_option('--search', '-s', dest="search", default=None, action="append", metavar="QUERY",
+parser.add_option('--search', '-s', dest="search", default=None, metavar="QUERY",
                   help="Query for other URLs inside every argument URLs and download them instead "
                        "of the URL itself.\n"
                        "See the pyquery documentation for more info about the query "
