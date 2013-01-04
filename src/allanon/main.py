@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 
+import sys
 import os
 
 from optparse import OptionParser
@@ -62,12 +63,14 @@ parser.add_option('--filename', '-f', dest="filename_model", default=None, metav
 
 def get_urls(raw_urls):
     for raw_url in raw_urls:
-        for url, ids in generate_urls(raw_url):
-            yield url, ids
+        for url, ids, max_ids in generate_urls(raw_url):
+            yield url, ids, max_ids
 
 
-def main():
-    options, args = parser.parse_args()
+def main(options=None, args=[]):
+    if not options:
+        # invocation from command line
+        options, args = parser.parse_args()
     
     if len(args)<1 or options.help:
         # personal version of the help, to being able to keep \n in description
@@ -76,15 +79,26 @@ def main():
         result.append(DESCRIPTION+"\n")
         result.append(parser.format_option_help(parser.formatter))
         print "\n".join(result)
+        sys.exit(0)
     
-    urls, ids = get_urls(args)
-    for index, url in enumerate(urls):
-        rg = ResourceGrabber(url)
-        if not options.search:
-            rg.download(options.destination_directory, options.filename_model, ids, index)
-        else:
-            rg.download_resources(options.search, options.destination_directory,
-                                  options.filename_model, ids, index)
+    urls = tuple(get_urls(args))
+    index_digit_len = len(urls)
+    try:
+        for index, urls_data in enumerate(urls):
+            url, ids, max_ids = urls_data
+            rg = ResourceGrabber(url)
+            if not options.search:
+                rg.download(options.destination_directory, options.filename_model, ids, index,
+                            ids_digit_len=max_ids,
+                            index_digit_len=index_digit_len)
+            else:
+                rg.download_resources(options.search, options.destination_directory,
+                                      options.filename_model, ids, index,
+                                      ids_digit_len=max_ids,
+                                      index_digit_len=index_digit_len)
+    except KeyboardInterrupt:
+        print "\nTerminated by user action"
+        sys.exit(1)
 
 
 if __name__ == '__main__':

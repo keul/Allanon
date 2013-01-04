@@ -51,12 +51,13 @@ def generate_urls(url, level=0):
         step = start<=end and 1 or -1
         for x in xrange(start, end+step, step):
             ids = [x]
+            max_ids = [len(str(max(start, end+step)))]
             new_url = spre.sub(str(x), url, 1)
             if new_url.find("{")==-1:
-                yield new_url, ids
-            for y, inner_ids in generate_urls(new_url, level+1):
-                yield y,  ids + inner_ids
+                yield new_url, ids, max_ids
+            for y, inner_ids, inner_max_ids in generate_urls(new_url, level+1):
+                yield y, ids + inner_ids, max_ids + inner_max_ids
     elif level==0:
         # first attempt doesn't match: then I'll return original URL
-        yield url, []
+        yield url, [], []
 

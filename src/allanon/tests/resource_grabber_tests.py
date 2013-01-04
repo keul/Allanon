@@ -42,6 +42,14 @@ class ResourceGrabberDirectDownalodTest(unittest.TestCase):
         self.assertTrue(os.path.exists(path))
         with open(path) as tfile:
             self.assertEqual(tfile.read(), "foo")
+        HTTPretty.register_uri(HTTPretty.GET, "http://baz.net/qux%20file.pdf/?bar=123",
+                           body="foo")
+        rg = ResourceGrabber("http://baz.net/qux%20file.pdf/?bar=123")
+        rg.download(self.directory)
+        path = os.path.join(self.directory, 'qux file.pdf')
+        self.assertTrue(os.path.exists(path))
+        with open(path) as tfile:
+            self.assertEqual(tfile.read(), "foo")
 
     def test_download_with_no_path(self):
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.net/",
@@ -94,9 +102,18 @@ class ResourceGrabberDirectDownalodTest(unittest.TestCase):
                          'foo.net-foo.pdf')
         self.assertEqual(rg._generate_filename_from_model('foo.pdf', '%INDEX-foo.pdf', index=12),
                          '12-foo.pdf')
+        self.assertEqual(rg._generate_filename_from_model('foo.pdf', '%INDEX-foo.pdf', index=12,
+                                                          index_digit_len=3),
+                         '012-foo.pdf')
         self.assertEqual(rg._generate_filename_from_model('foo.pdf', 'foo-%1-bar-%2.pdf',
-                                                          ids=[2, 5]),
-                         '12-foo.pdf')
+                                                          ids=[2, 5], ids_digit_len=[1,1]),
+                         'foo-2-bar-5.pdf')
+        self.assertEqual(rg._generate_filename_from_model('foo.pdf', 'foo-%1-bar-%2.pdf',
+                                                          ids=[2, 84],
+                                                          ids_digit_len=[2, 4],
+                                                          index_digit_len=4),
+                         'foo-02-bar-0084.pdf')
+
 
 class ResourceGrabberInnerResourcesTest(unittest.TestCase):
 
@@ -123,7 +140,7 @@ class ResourceGrabberInnerResourcesTest(unittest.TestCase):
         with open(os.path.join(self.test_dir, filename)) as f:
             return f.read()
 
-    def test_download_image(self):
+    def test_download(self):
         rg = ResourceGrabber("http://foo.org/main.html")
         rg.download_resources('div.images img', self.temp_dir)
         with open(os.path.join(self.temp_dir, 'image1.png')) as original:
