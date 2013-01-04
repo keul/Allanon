@@ -3,6 +3,7 @@
 import unittest
 
 from allanon.url_generator import generate_urls
+from allanon.url_generator import get_dynamic_urls
 
 class UrlGeneratorTest(unittest.TestCase):
 
@@ -27,6 +28,11 @@ class UrlGeneratorTest(unittest.TestCase):
         self.assertEqual(results, [("foo 4 bar", [4], [1]),
                                    ("foo 3 bar", [3], [1]),
                                    ("foo 2 bar", [2], [1])])
+        results = list(generate_urls("foo {12:9} bar"))
+        self.assertEqual(results, [("foo 12 bar", [12], [2]),
+                                   ("foo 11 bar", [11], [2]),
+                                   ("foo 10 bar", [10], [2]),
+                                   ("foo 9 bar", [9], [2])])
 
     def test_multiple(self):
         results = list(generate_urls("foo {3:4} bar {39:41} baz"))
@@ -55,6 +61,28 @@ class UrlGeneratorTest(unittest.TestCase):
                                     [1, 1, 1, 3]),
                                    ("foo 4 bar 6 baz 1 qux 143", [4, 6, 1, 143],
                                     [1, 1, 1, 3])])
+
+
+class DynamicURLGenerationTest(unittest.TestCase):
+    
+    def test_urls(self):
+        self.assertEqual(tuple(get_dynamic_urls(('http://host1/{1:2}/?param={3:4}',))),
+                         (('http://host1/1/?param=3', [1, 3], [1, 1]),
+                          ('http://host1/1/?param=4', [1, 4], [1, 1]),
+                          ('http://host1/2/?param=3', [2, 3], [1, 1]),
+                          ('http://host1/2/?param=4', [2, 4], [1, 1]))
+                         )
+
+    def test_multiple_urls(self):
+        self.assertEqual(tuple(get_dynamic_urls(('http://host1/{1:2}/?param={3:4}',
+                                                 'http://host2/dummy?param={11:12}',))),
+                         (('http://host1/1/?param=3', [1, 3], [1, 1]),
+                          ('http://host1/1/?param=4', [1, 4], [1, 1]),
+                          ('http://host1/2/?param=3', [2, 3], [1, 1]),
+                          ('http://host1/2/?param=4', [2, 4], [1, 1]),
+                          ('http://host2/dummy?param=11', [11], [2]),
+                          ('http://host2/dummy?param=12', [12], [2]))
+                         )
 
 
 if __name__ == "__main__":

@@ -29,6 +29,9 @@ def search_in_html(html, query, base_url=''):
     pq = PyQuery(html)
     elements = pq(query)
     for element in elements:
+        if isinstance(element, basestring):
+            # BBB pyquery return "something" also when no elements are found... bah!
+            continue 
         if element.tag=='img':
             yield apply_base_url(element.attrib.get('src'), base_url)
         elif element.tag=='a':

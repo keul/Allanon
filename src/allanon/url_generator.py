@@ -61,3 +61,8 @@ def generate_urls(url, level=0):
         # first attempt doesn't match: then I'll return original URL
         yield url, [], []
 
+
+def get_dynamic_urls(raw_urls):
+    for raw_url in raw_urls:
+        for url, ids, max_ids in generate_urls(raw_url):
+            yield url, ids, max_ids

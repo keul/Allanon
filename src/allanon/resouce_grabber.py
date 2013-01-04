@@ -95,7 +95,8 @@ class ResourceGrabber(object):
                  ids_digit_len=[], index_digit_len=0):
         self._open()
         filename = self._get_filename(filename_model=filename_model, ids=ids, index=index,
-                                      ids_digit_len=ids_digit_len, index_digit_len=ids_digit_len)
+                                      ids_digit_len=ids_digit_len,
+                                      index_digit_len=index_digit_len)
         path = os.path.join(directory, filename)
         if os.path.exists(path):
             raise IOError("File %s exists" % path)
@@ -112,5 +113,17 @@ class ResourceGrabber(object):
             rg = ResourceGrabber(url)
             rg.download(directory, filename_model=filename_model, ids=ids, index=index,
                         ids_digit_len=ids_digit_len, index_digit_len=ids_digit_len)
+
+    def get_internal_links(self, *args, **kwargs):
+        level = kwargs.get('level', 0)
+        self._open()
+        links = search_in_html(self.html, args[level], self.url)
+        for link in links:
+            rg = ResourceGrabber(link)
+            if len(args)>level+1:
+                for inner_link in rg.get_internal_links(*args, level=level+1):
+                    yield inner_link
+            else:
+                yield link
 
 

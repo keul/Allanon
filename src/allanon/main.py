@@ -5,7 +5,7 @@ import os
 
 from optparse import OptionParser
 
-from allanon.url_generator import generate_urls
+from allanon.url_generator import get_dynamic_urls
 from allanon.resouce_grabber import ResourceGrabber
 
 VERSION = "0.1"
@@ -37,11 +37,15 @@ parser.add_option('--help', '-h',
                  action="store_true", default=False,
                  help='show this help message and exit')
 
-parser.add_option('--search', '-s', dest="search", default=None, metavar="QUERY",
+parser.add_option('--search', '-s', dest="search_queries", default=[], action="append",
+                  metavar="QUERY",
                   help="Query for other URLs inside every argument URLs and download them instead "
                        "of the URL itself.\n"
                        "See the pyquery documentation for more info about the query "
-                       "format (http://packages.python.org/pyquery/).")
+                       "format (http://packages.python.org/pyquery/).\n"
+                       "Can be provided multiple times to recursively search for links to "
+                       "pages until resources are found (last search filter must always "
+                       "points to the final resource to download).")
 parser.add_option('--directory', '-d', dest="destination_directory", default=os.getcwd(),
                   metavar="TARGET_DIR",
                   help="Directory where to store all resources that will be downloaded.\n"
@@ -61,13 +65,7 @@ parser.add_option('--filename', '-f', dest="filename_model", default=None, metav
                        "Default is \"%FULLNAME\"")
 
 
-def get_urls(raw_urls):
-    for raw_url in raw_urls:
-        for url, ids, max_ids in generate_urls(raw_url):
-            yield url, ids, max_ids
-
-
-def main(options=None, args=[]):
+def main(options=None, *args):
     if not options:
         # invocation from command line
         options, args = parser.parse_args()
@@ -82,21 +80,26 @@ def main(options=None, args=[]):
         print "\n".join(result)
         sys.exit(0)
     
-    urls = tuple(get_urls(args))
-    index_digit_len = len(urls)
+    # first, command line URLs sequence
     try:
+        urls = get_dynamic_urls(args)
+        index_digit_len = 0
+        if options.filename_model and '%INDEX' in options.filename_model:
+            # optimization: we don't need to count all the URLs in that case
+            urls = tuple(urls)
+            index_digit_len = len(str(len(urls)))
+
+        if options.search_queries:
+            for generated_url in urls:
+                rg = ResourceGrabber(generated_url[0])
+                inner_urls = rg.get_internal_links(*options.search_queries)
+            urls = get_dynamic_urls(inner_urls)
         for index, urls_data in enumerate(urls):
             url, ids, max_ids = urls_data
             rg = ResourceGrabber(url)
-            if not options.search:
-                rg.download(options.destination_directory, options.filename_model, ids, index,
-                            ids_digit_len=max_ids,
-                            index_digit_len=index_digit_len)
-            else:
-                rg.download_resources(options.search, options.destination_directory,
-                                      options.filename_model, ids, index,
-                                      ids_digit_len=max_ids,
-                                      index_digit_len=index_digit_len)
+            rg.download(options.destination_directory, options.filename_model, ids, index+1,
+                        ids_digit_len=max_ids,
+                        index_digit_len=index_digit_len)
     except KeyboardInterrupt:
         print "\nTerminated by user action"
         sys.exit(1)

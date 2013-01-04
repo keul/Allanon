@@ -158,5 +158,30 @@ class ResourceGrabberInnerResourcesTest(unittest.TestCase):
                              "Allanon was killed in the battle with a Jachyra")
 
 
+    def test_get_internal_links(self):
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/main.html",
+                               body=self._read_file('page.html'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page1.html",
+                               body=self._read_file('page1.html'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page2.html",
+                               body=self._read_file('page2.html'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text1.txt",
+                               body=self._read_file('text1.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text2.txt",
+                               body=self._read_file('text2.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text3.txt",
+                               body=self._read_file('text1.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text4.txt",
+                               body=self._read_file('text2.txt'))
+
+        rg = ResourceGrabber("http://recursive.org/main.html")
+        links = rg.get_internal_links('.recursiveTest a', 'li a')
+        self.assertEqual(list(links),
+                         ['http://recursive.org/text1.txt',
+                          'http://recursive.org/text2.txt',
+                          'http://recursive.org/text3.txt',
+                          'http://recursive.org/text4.txt'])
+
+
 if __name__ == "__main__":
     unittest.main()
