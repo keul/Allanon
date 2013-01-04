@@ -27,7 +27,7 @@ This will make this utility to crawl through a set of URLs like this:
 
 """.strip()
 
-parser = OptionParser(usage="Usage: %prog [option, ...] urls_model [urls_model, ...]",
+parser = OptionParser(usage="Usage: %prog [option, ...] url_model [url_model, ...]",
                       version="%prog " + VERSION,
                       description=DESCRIPTION,
                       prog="allanon")
@@ -37,9 +37,9 @@ parser.add_option('--help', '-h',
                  action="store_true", default=False,
                  help='show this help message and exit')
 
-parser.add_option('--search', '-s', dest="search", default=None,
-                  help="Look for resource inside every URLs and download it instead of the "
-                       "URL itself.\n"
+parser.add_option('--search', '-s', dest="search", default=None, action="append", metavar="QUERY",
+                  help="Query for other URLs inside every argument URLs and download them instead "
+                       "of the URL itself.\n"
                        "See the pyquery documentation for more info about the query "
                        "format (http://packages.python.org/pyquery/).")
 parser.add_option('--directory', '-d', dest="destination_directory", default=os.getcwd(),
@@ -74,7 +74,8 @@ def main(options=None, args=[]):
     
     if len(args)<1 or options.help:
         # personal version of the help, to being able to keep \n in description
-        result = []
+        result = ['Allanon: a crawler for visit a predictable set of URLs, '
+                  'and download resources from them\n']
         result.append(parser.get_usage())
         result.append(DESCRIPTION+"\n")
         result.append(parser.format_option_help(parser.formatter))

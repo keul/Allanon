@@ -5,7 +5,7 @@ setup(name='Allanon',
       # scripts=['src/allanon',],
       version="0.1",
       description="A crawler for visit a predictable set of URLs, "
-                  "and download resources inside visited pages",
+                  "and download resources from them",
       long_description=open("README.rst").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       classifiers=["Development Status :: 3 - Alpha",
