@@ -3,17 +3,17 @@ import sys, os
 
 setup(name='Allanon',
       # scripts=['src/allanon',],
-      version="0.1",
+      version=os.path.join("src", "allanon", "version.txt"),
       description="A crawler for visit a predictable set of URLs, "
                   "and download resources from them",
       long_description=open("README.rst").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       classifiers=["Development Status :: 3 - Alpha",
-                   "Intended Audience :: End Users/Desktop",
                    "License :: OSI Approved :: GNU General Public License (GPL)",
                    "Operating System :: OS Independent",
                    "Programming Language :: Python",
                    "Topic :: Utilities",
+                   "Topic :: System :: Shells",
                    "Topic :: Internet :: WWW/HTTP",
                    "Programming Language :: Python",
                    "Programming Language :: Python :: 2.7",
