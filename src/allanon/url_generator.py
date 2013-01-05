@@ -2,9 +2,9 @@
 
 
 import re
+from allanon.resouce_grabber import ResourceGrabber
 
 SPREAD_MODEL = r"""\{(?P<start>\d+)\:(?P<end>\d+)\}"""
-
 spre = re.compile(SPREAD_MODEL)
 
 def generate_urls(url, level=0):
@@ -62,7 +62,19 @@ def generate_urls(url, level=0):
         yield url, [], []
 
 
-def get_dynamic_urls(raw_urls):
+def get_dynamic_urls(raw_urls, outer_ids=[], outer_max_ids=[]):
     for raw_url in raw_urls:
         for url, ids, max_ids in generate_urls(raw_url):
+            ids = ids or outer_ids
+            max_ids = max_ids or outer_max_ids
             yield url, ids, max_ids
+
+
+def search_resources(urls, search_queries):
+    for generated_url in urls:
+        url, ids, max_ids = generated_url
+        rg = ResourceGrabber(url)
+        inner_urls = rg.get_internal_links(*search_queries)
+        for url in inner_urls:
+            yield url, ids, max_ids
+

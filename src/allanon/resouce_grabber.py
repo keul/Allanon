@@ -7,11 +7,13 @@ from urlparse import urlparse
 
 import requests
 
-from allanon import logger
 from allanon.html_crawler import search_in_html
 
 CONTENT_DISPOSITION_MODEL = r"""^.*filename\s*=\s*(?P<filename>.*?);?$"""
 cdre = re.compile(CONTENT_DISPOSITION_MODEL, re.IGNORECASE)
+
+DYNA_ID_MODEL = r"""(\%\d+)"""
+dynaid_re = re.compile(DYNA_ID_MODEL)
 
 
 def _int_format(i, ilen):
@@ -69,10 +71,12 @@ class ResourceGrabber(object):
         filename = filename_model
         # replace %x with proper ids
         cnt = 0
-        while filename.find("%")>-1 and filename[filename.find("%")+1].isdigit():
-            id = int(filename[filename.find("%")+1])
-            filename = filename.replace("%%%d" % id, _int_format(ids[cnt],
-                                                                 ids_digit_len[cnt]), 1)
+        while dynaid_re.search(filename):
+            match = dynaid_re.search(filename)
+            dynaid = match.group()
+            filename = filename.replace(dynaid,
+                                        _int_format(ids[cnt],
+                                                    ids_digit_len[cnt]), 1)
             cnt+=1
         # replace #INDEX with the progressive
         if filename.find("%INDEX")>-1:

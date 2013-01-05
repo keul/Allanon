@@ -80,23 +80,27 @@ class AllanonTest(unittest.TestCase):
 
     # Step 2: really useful features
     def inner_resources_download_test(self):
+        # main command line URLs set
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.org/section-1/download.html",
                                body=self._read_file('page.html'))
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.org/section-2/download.html",
                                body=self._read_file('page1.html'))
-        self.options.filename_model = "%INDEX-%FULLNAME"
+        self.options.filename_model = "%INDEX-%1-%FULLNAME"
         self.options.search_queries = ['div.recursiveTest a']
-        HTTPretty.register_uri(HTTPretty.GET, "http://foofiles.org/text1.txt",
+        # resources found inside main pages
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page1.html",
                                body=self._read_file('text1.txt'))
-        HTTPretty.register_uri(HTTPretty.GET, "http://foofiles.org/text1.txt",
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page2.html",
                                body=self._read_file('text2.txt'))
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text1.txt",
                                body=self._read_file('text1.txt'))
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text2.txt",
                                body=self._read_file('text2.txt'))
         main(self.options, 'http://foo.org/section-{1:2}/download.html')
-        self.assertEqual(self._get_downloaded_files(), ['1-text1.txt', '2-text2.txt'])
-    
+        self.assertEqual(self._get_downloaded_files(), ['1-1-page1.html', '2-1-page2.html',
+                                                        '3-2-text1.txt', '4-2-text2.txt',
+                                                        ])
+
 
 if __name__ == "__main__":
     unittest.main()

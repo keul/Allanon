@@ -36,6 +36,14 @@ def search_in_html(html, query, base_url=''):
             yield apply_base_url(element.attrib.get('src'), base_url)
         elif element.tag=='a':
             yield apply_base_url(element.attrib.get('href'), base_url)
+        elif element.tag=='embed':
+            yield apply_base_url(element.attrib.get('src'), base_url)
+        elif element.tag=='object':
+            yield apply_base_url(element.attrib.get('data'), base_url)
+        elif element.tag=='param':
+            yield apply_base_url(element.attrib.get('value'), base_url)
+        elif element.tag=='source':
+            yield apply_base_url(element.attrib.get('src'), base_url)
         else:
             # default, hoping that we are pointing to some text that is an URL
             yield apply_base_url(element.text, base_url)

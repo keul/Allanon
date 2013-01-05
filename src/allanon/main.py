@@ -1,14 +1,16 @@
 # -*- coding: utf8 -*-
 
 import sys
-import os
+import os.path
 
 from optparse import OptionParser
 
+from allanon import logger
 from allanon.url_generator import get_dynamic_urls
+from allanon.url_generator import search_resources
 from allanon.resouce_grabber import ResourceGrabber
 
-VERSION = "0.1"
+VERSION = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "version.txt")).read()
 DESCRIPTION = """
 Crawl a replicable set of URLs, then download resources from them.
 
@@ -84,22 +86,26 @@ def main(options=None, *args):
     try:
         urls = get_dynamic_urls(args)
         index_digit_len = 0
+
+        # optimization: we don't need to count all the URLs in that case
         if options.filename_model and '%INDEX' in options.filename_model:
-            # optimization: we don't need to count all the URLs in that case
             urls = tuple(urls)
             index_digit_len = len(str(len(urls)))
 
+        # in case we are not directly downloading, we need to look for inner resources
         if options.search_queries:
-            for generated_url in urls:
-                rg = ResourceGrabber(generated_url[0])
-                inner_urls = rg.get_internal_links(*options.search_queries)
-            urls = get_dynamic_urls(inner_urls)
+            urls = search_resources(urls, options.search_queries)
+
         for index, urls_data in enumerate(urls):
             url, ids, max_ids = urls_data
             rg = ResourceGrabber(url)
-            rg.download(options.destination_directory, options.filename_model, ids, index+1,
-                        ids_digit_len=max_ids,
-                        index_digit_len=index_digit_len)
+            try:
+                rg.download(options.destination_directory, options.filename_model, ids, index+1,
+                            ids_digit_len=max_ids,
+                            index_digit_len=index_digit_len)
+            except IOError, inst:
+                logger.warning(str(inst))
+                print "Skipping (%s)" % inst
     except KeyboardInterrupt:
         print "\nTerminated by user action"
         sys.exit(1)
