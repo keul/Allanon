@@ -79,6 +79,8 @@ def main(options=None, *args):
         result.append(parser.get_usage())
         result.append(DESCRIPTION+"\n")
         result.append(parser.format_option_help(parser.formatter))
+        result.append('See https://github.com/keul/Allanon for detailed documentation or '
+                      'provide bug report.')
         print "\n".join(result)
         sys.exit(0)
     
