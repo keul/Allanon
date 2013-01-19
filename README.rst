@@ -104,11 +104,12 @@ Extreme usage (uncommon, but possible)
 
 The ``--search`` parameter can be provided multiple times::
 
-    allanon --search "ul.image-repos a" \
+    $ allanon --search "ul.image-repos a" \
     > --search "div.image-containers img" \ 
     > "http://image-repository-sites.org/category{1:30}.html"
 
 When you provide (for example) two different search parameters, you are meaning:
+
     "*I dont' want to download the given URL. This/those URL contains links to secondary pages,
     and inside those pages there are links to resources I want to download*"
 
@@ -133,7 +134,7 @@ Instead of downloading resources "as is", you can change dynamically the filenam
 
 An example::
 
-    $ allanon --filename="%HOST-%INDEX-section%1-version%3-%FULLNAME"
+    $ allanon --filename="%HOST-%INDEX-section%1-version%3-%FULLNAME" \
     > "http://foo.org/pdf-repo-{1:10}/file{1:50}.pdf?version={0:3}"
 
 ``%HOST``
