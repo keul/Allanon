@@ -39,7 +39,7 @@ You simply need to provide it:
 
 Quick example (you can keep it single lined)::
 
-    allanon --search "#movie-container embed" \
+    $ allanon --search "#movie-container embed" \
     > "http://legal-streaming-site.org/program-name/season{1:6}/episode{1:22}"
 
 Documentation
