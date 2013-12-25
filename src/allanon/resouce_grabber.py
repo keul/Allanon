@@ -7,6 +7,7 @@ from urlparse import urlparse
 
 import requests
 
+from allanon import config
 from allanon.html_crawler import search_in_html
 
 CONTENT_DISPOSITION_MODEL = r"""^.*filename\s*=\s*(?P<filename>.*?);?$"""
@@ -58,7 +59,7 @@ class ResourceGrabber(object):
     def _open(self):
         if self.request is None:
             print "Getting %s" % self.url
-            self.request = requests.get(self.url)
+            self.request = requests.get(self.url, headers=config.headers())
             if self.request.status_code>=200 and self.request.status_code<300:
                 print "Done"
             else:

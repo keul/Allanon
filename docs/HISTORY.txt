@@ -6,6 +6,7 @@ Changelog
 
 - Do not crawl or download when on error pages
 - Handle duplicate filename when downloading resources
+- Application specific user agent header (configurable)
 
 0.1 (2013-01-05)
 ----------------

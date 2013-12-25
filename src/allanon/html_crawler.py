@@ -3,6 +3,7 @@
 from pyquery import PyQuery
 from urlparse import urlparse
 
+
 def apply_base_url(url, base_url):
     if url.startswith('http') or url.startswith('https') or url.startswith('ftp'):
         return url

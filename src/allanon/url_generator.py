@@ -1,11 +1,11 @@
 # -*- coding: utf8 -*-
 
-
 import re
 from allanon.resouce_grabber import ResourceGrabber
 
 SPREAD_MODEL = r"""\{(?P<start>\d+)\:(?P<end>\d+)\}"""
 spre = re.compile(SPREAD_MODEL)
+
 
 def generate_urls(url, level=0):
     """

@@ -110,7 +110,7 @@ The ``--search`` parameter can be provided multiple times::
 
 When you provide (for example) two different search parameters, you are meaning:
 
-    "*I dont' want to download the given URL. This/those URL contains links to secondary pages,
+    "*I don't want to download the given URL. This/those URL contains links to secondary pages,
     and inside those pages there are links to resources I want to download*"
 
 Filters are applied in the given order, so:

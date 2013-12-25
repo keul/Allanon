@@ -5,7 +5,7 @@ import os.path
 
 from optparse import OptionParser
 
-from allanon import logger
+from allanon import config
 from allanon.url_generator import get_dynamic_urls
 from allanon.url_generator import search_resources
 from allanon.resouce_grabber import ResourceGrabber
@@ -65,6 +65,9 @@ parser.add_option('--filename', '-f', dest="filename_model", default=None, metav
                        "Use %EXTENSION for include the original file extensions.\n"
                        "Use %FULLNAME for include the original filename (with extension)\n"
                        "Default is \"%FULLNAME\"")
+parser.add_option('--user-agent', dest="user_agent", default=None, metavar="USER_AGENT",
+                  help="Change the User-Agent header sent with every request.\n"
+                       "Default is \"Allanon Crawler <version number>\".")
 
 
 def main(options=None, *args):
@@ -83,6 +86,9 @@ def main(options=None, *args):
                       'provide bug report.')
         print "\n".join(result)
         sys.exit(0)
+    
+    if options.user_agent:
+        config.USER_AGENT = options.user_agent
     
     # first, command line URLs sequence
     try:
