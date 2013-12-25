@@ -116,9 +116,9 @@ When you provide (for example) two different search parameters, you are meaning:
 Filters are applied in the given order, so:
 
 * Allanon will search inside 30 pages named *category1.html*, *category2.html*, ...
-* inside those pages, Allanon will look for all links inside *UL* tags with CSS class
-  "*image-repos*" and recurvisely search inside them
-* inside those pages, Allanon will looks for images inside *DIV* with class "*image-containers*"
+* inside those pages, Allanon will look for all links inside ``ul`` tags with CSS class
+  *image-repos* and recursively search inside them
+* inside those pages, Allanon will looks for images inside ``div`` with class *image-containers*
 * images will be downloaded
 
 Potentially you can continue this way, providing a third level of filters, and so on.
@@ -148,7 +148,7 @@ An example::
     In this case "%1" is the current "pdf-repo-*x*" number and "%3" is the "version"
     parameter value.
 ``%FULLNAME``
-    If the original filename (the one used if ``--filename`` is not provided).
+    The original filename (the one used if ``--filename`` is not provided).
     
     You can also use the ``%NAME`` and ``%EXTENSION`` to get only the name of the file
     (without extension) or simply the extension.
@@ -159,11 +159,9 @@ TODO
 This utility is in alpha stage, a lot of thing can goes wrong when downloading and many features
 are missing:
 
-* supporting authentication
-* do not try to download or crawl when the loaded page is an error/not-found page
-* what to do with duplicates resources (right now: we are skipping)?
 * verbosity controls
 * handle timeout and sleep time after each download
+* bandwith control
 
 If you find other bug or want to ask for a missing feature, use the `product issue tracker`__.
 

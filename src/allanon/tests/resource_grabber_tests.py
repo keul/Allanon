@@ -8,6 +8,7 @@ import unittest
 from httpretty import HTTPretty
 
 from allanon.resouce_grabber import ResourceGrabber
+from allanon.resouce_grabber import _try_new_filename
 
 class ResourceGrabberDirectDownalodTest(unittest.TestCase):
     
@@ -82,14 +83,19 @@ class ResourceGrabberDirectDownalodTest(unittest.TestCase):
         with open(path) as tfile:
             self.assertEqual(tfile.read(), "foo")
 
-    def test_file_exists_error(self):
+    def test_file_exists(self):
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.net/foo.pdf",
                            body="foo")
         rg = ResourceGrabber("http://foo.net/foo.pdf")
-        f = open(os.path.join(self.directory, 'foo.pdf'), 'wb')
-        f.write('bar')
-        f.close()
-        self.assertRaises(IOError, rg.download, self.directory)
+        with open(os.path.join(self.directory, 'foo.pdf'), 'wb') as f:
+            f.write('bar')
+        with open(os.path.join(self.directory, 'foo_1.pdf'), 'wb') as f:
+            f.write('baz')
+        rg.download(self.directory)
+        path = os.path.join(self.directory, 'foo_2.pdf')
+        self.assertTrue(os.path.exists(path))
+        with open(path) as tfile:
+            self.assertEqual(tfile.read(), "foo")
 
     def test_generate_filename_from_model(self):
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.net/foo.pdf")
@@ -129,6 +135,8 @@ class ResourceGrabberInnerResourcesTest(unittest.TestCase):
                                body=self._read_file('text1.txt'))
         HTTPretty.register_uri(HTTPretty.GET, "http://foofiles.org/text2.txt",
                                body=self._read_file('text2.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://foofiles.org/text3.txt",
+                               body=self._read_file('notfound.html'), status=404)
         f = open(os.path.join(self.test_dir, 'page.html'))
         self.html = f.read()
         f.close()
@@ -157,6 +165,14 @@ class ResourceGrabberInnerResourcesTest(unittest.TestCase):
             self.assertEqual(downloaded.read(),
                              "Allanon was killed in the battle with a Jachyra")
 
+    def test_mass_download_with_error(self):
+        """Some of target resource contains error"""
+        rg = ResourceGrabber("http://foo.org/main.html")
+        rg.download_resources('div.linksButSomeBroken a', self.temp_dir)
+        with open(os.path.join(self.test_dir, 'text1.txt')) as downloaded:
+            self.assertEqual(downloaded.read(),
+                             "Allanon was the last of the Druids of Paranor")
+        self.assertFalse(os.path.exists(os.path.join(self.temp_dir, 'text3.txt')))
 
     def test_get_internal_links(self):
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/main.html",
@@ -165,6 +181,9 @@ class ResourceGrabberInnerResourcesTest(unittest.TestCase):
                                body=self._read_file('page1.html'))
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page2.html",
                                body=self._read_file('page2.html'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page3.html",
+                               body=self._read_file('notfound.html'), status=404)
+        # these are resourced inside pages defined above
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text1.txt",
                                body=self._read_file('text1.txt'))
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text2.txt",
@@ -181,6 +200,25 @@ class ResourceGrabberInnerResourcesTest(unittest.TestCase):
                           'http://recursive.org/text2.txt',
                           'http://recursive.org/text3.txt',
                           'http://recursive.org/text4.txt'])
+
+
+class TextTryNewFilename(unittest.TestCase):
+
+    def test_simple_no_extension(self):
+        self.assertEqual(_try_new_filename('foo'),
+                         'foo_1')
+
+    def test_simple_extension(self):
+        self.assertEqual(_try_new_filename('foo.txt'),
+                         'foo_1.txt')
+
+    def test_index_extension(self):
+        self.assertEqual(_try_new_filename('foo_2.txt'),
+                         'foo_3.txt')
+
+    def test_index_no_extension(self):
+        self.assertEqual(_try_new_filename('foo_2'),
+                         'foo_3')
 
 
 if __name__ == "__main__":

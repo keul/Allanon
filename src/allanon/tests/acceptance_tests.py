@@ -92,13 +92,15 @@ class AllanonTest(unittest.TestCase):
                                body=self._read_file('text1.txt'))
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page2.html",
                                body=self._read_file('text2.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page3.html",
+                               body=self._read_file('notfound.html'), status=404)
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text1.txt",
                                body=self._read_file('text1.txt'))
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text2.txt",
                                body=self._read_file('text2.txt'))
         main(self.options, 'http://foo.org/section-{1:2}/download.html')
         self.assertEqual(self._get_downloaded_files(), ['1-1-page1.html', '2-1-page2.html',
-                                                        '3-2-text1.txt', '4-2-text2.txt',
+                                                        '4-2-text1.txt', '5-2-text2.txt',
                                                         ])
 
 

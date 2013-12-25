@@ -10,7 +10,7 @@ from allanon.html_crawler import apply_base_url
 
 
 class HtmlCrawlingTest(unittest.TestCase):
-    
+
     def setUp(self):
         self.dir_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
         HTTPretty.enable()
@@ -23,7 +23,7 @@ class HtmlCrawlingTest(unittest.TestCase):
         f = open(os.path.join(self.dir_name, 'page.html'))
         self.html = f.read()
         f.close()
-    
+
     def tearDown(self):
         HTTPretty.disable()
 
@@ -36,7 +36,7 @@ class HtmlCrawlingTest(unittest.TestCase):
                          'http://foofiles.org/text1.txt')
 
     def test_basic_filter_textual(self):
-        self.assertEqual(list(search_in_html(self.html, 'div:eq(2)'))[0],
+        self.assertEqual(list(search_in_html(self.html, 'div:eq(3)'))[0],
                          'http://fooimages.org/image1.png')
 
     def test_multiple_filter(self):

@@ -4,8 +4,8 @@ Changelog
 0.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Do not crawl or download when on error pages
+- Handle duplicate filename when downloading resources
 
 0.1 (2013-01-05)
 ----------------

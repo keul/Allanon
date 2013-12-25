@@ -101,13 +101,9 @@ def main(options=None, *args):
         for index, urls_data in enumerate(urls):
             url, ids, max_ids = urls_data
             rg = ResourceGrabber(url)
-            try:
-                rg.download(options.destination_directory, options.filename_model, ids, index+1,
-                            ids_digit_len=max_ids,
-                            index_digit_len=index_digit_len)
-            except IOError, inst:
-                logger.warning(str(inst))
-                print "Skipping (%s)" % inst
+            rg.download(options.destination_directory, options.filename_model, ids, index+1,
+                        ids_digit_len=max_ids,
+                        index_digit_len=index_digit_len)
     except KeyboardInterrupt:
         print "\nTerminated by user action"
         sys.exit(1)

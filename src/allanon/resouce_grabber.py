@@ -15,11 +15,32 @@ cdre = re.compile(CONTENT_DISPOSITION_MODEL, re.IGNORECASE)
 DYNA_ID_MODEL = r"""(\%\d+)"""
 dynaid_re = re.compile(DYNA_ID_MODEL)
 
+EXTENSION_MODEL = r"""^(?P<name>.+?)(?P<index>_\d+)?(?P<extension>\.[a-zA-Z]{2,4})?$"""
+
 
 def _int_format(i, ilen):
     if not ilen:
         return str(i)
     return ("%%0%dd" % ilen) % i
+
+def _try_new_filename(filename):
+    """
+    Getting a filename in the form foo_X.ext where X,
+    it generate a new filename as foo_Y.ext, where Y is X+1
+    
+    In the case that _X is missing (like foo.ext), Y=1 i used
+    
+    Extension is optional
+    """
+    match = re.match(EXTENSION_MODEL, filename)
+    if match:
+        name, version, extension = match.groups()
+        if version:
+            version = "_%d" % (int(version[1:])+1)
+        else:
+            version = "_1"
+        filename = name + version + (extension if extension else '')
+    return filename    
 
 
 class ResourceGrabber(object):
@@ -38,7 +59,11 @@ class ResourceGrabber(object):
         if self.request is None:
             print "Getting %s" % self.url
             self.request = requests.get(self.url)
-            print "Done"
+            if self.request.status_code>=200 and self.request.status_code<300:
+                print "Done"
+            else:
+                print "Can't get resource at %s. HTTP error %d" % (self.url,
+                                                                   self.request.status_code)
     
     def _get_filename(self, filename_model=None, ids=[], index=0,
                       ids_digit_len=0, index_digit_len=0):
@@ -102,12 +127,14 @@ class ResourceGrabber(object):
                                       ids_digit_len=ids_digit_len,
                                       index_digit_len=index_digit_len)
         path = os.path.join(directory, filename)
-        if os.path.exists(path):
-            raise IOError("File %s exists" % path)
-        print "Writing resource to %s" % path
-        f = open(path, 'wb')
-        f.write(self.request.content)
-        f.close()
+        while os.path.exists(path):
+            # continue trying until we get a good filename
+            filename = _try_new_filename(filename)
+            path = os.path.join(directory, filename)
+        if self.request.status_code>=200 and self.request.status_code<300:
+            with open(path, 'wb') as f:
+                print "Writing resource to %s" % path
+                f.write(self.request.content)
 
     def download_resources(self, query, directory, filename_model=None, ids=[], index=0,
                            ids_digit_len=[], index_digit_len=0):
@@ -121,13 +148,14 @@ class ResourceGrabber(object):
     def get_internal_links(self, *args, **kwargs):
         level = kwargs.get('level', 0)
         self._open()
-        links = search_in_html(self.html, args[level], self.url)
-        for link in links:
-            rg = ResourceGrabber(link)
-            if len(args)>level+1:
-                for inner_link in rg.get_internal_links(*args, level=level+1):
-                    yield inner_link
-            else:
-                yield link
+        if self.request.status_code >=200 and self.request.status_code<300:
+            links = search_in_html(self.html, args[level], self.url)
+            for link in links:
+                rg = ResourceGrabber(link)
+                if len(args)>level+1:
+                    for inner_link in rg.get_internal_links(*args, level=level+1):
+                        yield inner_link
+                else:
+                    yield link
 
 
