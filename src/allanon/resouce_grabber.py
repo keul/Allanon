@@ -125,6 +125,7 @@ class ResourceGrabber(object):
 
     def download(self, directory, filename_model=None, ids=[], index=0,
                  ids_digit_len=[], index_digit_len=0, duplicate_check=False):
+        """Download a remote resource. Return the new path or None if no resource has been created"""
         self._open()
         filename = self._get_filename(filename_model=filename_model, ids=ids, index=index,
                                       ids_digit_len=ids_digit_len,
@@ -141,7 +142,7 @@ class ResourceGrabber(object):
             if md5_saved==md5_remote:
                 # same file
                 print "Resource at %s is a duplicate of %s" % (self.url,
-                                                              path)
+                                                               path)
                 return
         while os.path.exists(path):
             # continue trying until we get a good filename
@@ -154,13 +155,14 @@ class ResourceGrabber(object):
             return path
 
     def download_resources(self, query, directory, filename_model=None, ids=[], index=0,
-                           ids_digit_len=[], index_digit_len=0):
+                           ids_digit_len=[], index_digit_len=0, duplicate_check=False):
         self._open()
         resources = search_in_html(self.html, query, self.url)
         for url in resources:
             rg = ResourceGrabber(url)
             rg.download(directory, filename_model=filename_model, ids=ids, index=index,
-                        ids_digit_len=ids_digit_len, index_digit_len=ids_digit_len)
+                        ids_digit_len=ids_digit_len, index_digit_len=ids_digit_len,
+                        duplicate_check=duplicate_check)
 
     def get_internal_links(self, *args, **kwargs):
         level = kwargs.get('level', 0)
