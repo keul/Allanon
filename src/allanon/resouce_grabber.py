@@ -106,10 +106,10 @@ class ResourceGrabber(object):
                                         _int_format(ids[cnt],
                                                     ids_digit_len[cnt]), 1)
             cnt+=1
-        # replace #INDEX with the progressive
+        # replace %INDEX with the progressive
         if filename.find("%INDEX")>-1:
             filename = filename.replace("%INDEX", _int_format(index, index_digit_len))
-        # replace #HOST with current host
+        # replace %HOST with current host
         if filename.find("%HOST")>-1:
             filename = filename.replace("%HOST", self.url_info.hostname)
         # replace %NAME with original filename
@@ -123,6 +123,15 @@ class ResourceGrabber(object):
             filename = filename.replace("%FULLNAME", original)
         return filename
 
+    def _create_subdirs(self, directory):
+        """Given a directory name, or a directory path string in nix format
+        (e.g: foo/bar), create all intermediate directories.
+        Return the new (existing) final directory absolute path 
+        """
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        return directory
+
     def download(self, directory, filename_model=None, ids=[], index=0,
                  ids_digit_len=[], index_digit_len=0, duplicate_check=False):
         """Download a remote resource. Return the new path or None if no resource has been created"""
@@ -130,6 +139,7 @@ class ResourceGrabber(object):
         filename = self._get_filename(filename_model=filename_model, ids=ids, index=index,
                                       ids_digit_len=ids_digit_len,
                                       index_digit_len=index_digit_len)
+        directory = self._create_subdirs(directory)
         path = os.path.join(directory, filename)
         if duplicate_check and os.path.exists(path):
             # Before trying to find a free filename, check is this file is a duplicate

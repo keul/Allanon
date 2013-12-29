@@ -51,7 +51,9 @@ parser.add_option('--search', '-s', dest="search_queries", default=[], action="a
 parser.add_option('--directory', '-d', dest="destination_directory", default=os.getcwd(),
                   metavar="TARGET_DIR",
                   help="Directory where to store all resources that will be downloaded.\n"
-                       "Default is the current directory")
+                       "Default is the current directory.\n"
+                       "Can be also a directory path string in nix format (like \"foo/bar\"), "
+                       "in that case all intermediate directories will be created.")
 parser.add_option('--filename', '-f', dest="filename_model", default=None, metavar="FILENAME",
                   help="Download resources with a custom, dynamic, filename.\n"
                        "You can use some marker for creating a dynamic content.\n"
@@ -66,9 +68,9 @@ parser.add_option('--filename', '-f', dest="filename_model", default=None, metav
                        "Use %FULLNAME for include the original filename (with extension)\n"
                        "Default is \"%FULLNAME\"")
 parser.add_option("--check-duplicate", action="store_true", dest="duplicate_check", default=False,
-                  help="When finding a duplicate filename, check if both files are duplicate. "
-                       "In this case, do not save the second file. Default action is to keep all "
-                       "resources handling filename collision.")
+                  help="When finding a duplicate filename check they are duplicates. "
+                       "In this case, do not save the new file. Default action is to keep all "
+                       "resources handling filename collision, without checking files content.")
 parser.add_option('--user-agent', dest="user_agent", default=None, metavar="USER_AGENT",
                   help="Change the User-Agent header sent with every request.\n"
                        "Default is \"Allanon Crawler <version number>\".")

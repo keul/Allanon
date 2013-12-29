@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 
 from tempfile import mkdtemp
+import os
 import os.path
 
 import unittest
@@ -10,7 +11,30 @@ from httpretty import HTTPretty
 from allanon.resouce_grabber import ResourceGrabber
 from allanon.resouce_grabber import _try_new_filename
 
-class ResourceGrabberDirectDownalodTest(unittest.TestCase):
+
+class ResourceGrabberTest(unittest.TestCase):
+    
+    def setUp(self):
+        self.directory = mkdtemp()
+    
+    def test_create_subdirs(self):
+        rg = ResourceGrabber('foo')
+        self.assertEqual(rg._create_subdirs(os.path.join(self.directory, 'foo')),
+                         os.path.join(self.directory, 'foo'))
+
+    def test_create_multiple_dirs(self):
+        rg = ResourceGrabber('foo')
+        self.assertEqual(rg._create_subdirs(os.path.join(self.directory, 'foo/bar/baz')),
+                         os.path.join(self.directory, 'foo', 'bar', 'baz'))
+
+    def test_create_multiple_dirs_some_exists(self):
+        rg = ResourceGrabber('foo')
+        os.mkdir(os.path.join(self.directory, 'foo'))
+        self.assertEqual(rg._create_subdirs(os.path.join(self.directory, 'foo/bar/baz')),
+                         os.path.join(self.directory, 'foo', 'bar', 'baz'))
+
+
+class ResourceGrabberDirectDownloadTest(unittest.TestCase):
     
     def setUp(self):
         HTTPretty.enable()
