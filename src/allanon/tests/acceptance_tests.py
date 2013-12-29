@@ -20,6 +20,8 @@ class AllanonTest(unittest.TestCase):
         self.options.search_queries = []
         self.temp_dir = mkdtemp()
         self.options.destination_directory = self.temp_dir
+        self.options.user_agent = None
+        self.options.duplicate_check = False        
         self.test_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
         HTTPretty.enable()
 

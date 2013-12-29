@@ -5,8 +5,10 @@ Changelog
 ----------------
 
 - Do not crawl or download when on error pages
-- Handle duplicate filename when downloading resources
-- Application specific user agent header (configurable)
+- Handle duplicate filename when downloading resources:
+  added the ``--check-duplicate`` option
+- Application specific user agent header (configurable
+  through ``--user-agent`` option)
 
 0.1 (2013-01-05)
 ----------------

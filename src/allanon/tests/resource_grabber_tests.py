@@ -91,11 +91,19 @@ class ResourceGrabberDirectDownalodTest(unittest.TestCase):
             f.write('bar')
         with open(os.path.join(self.directory, 'foo_1.pdf'), 'wb') as f:
             f.write('baz')
-        rg.download(self.directory)
         path = os.path.join(self.directory, 'foo_2.pdf')
+        self.assertEqual(rg.download(self.directory), path)
         self.assertTrue(os.path.exists(path))
         with open(path) as tfile:
             self.assertEqual(tfile.read(), "foo")
+
+    def test_file_exists_no_duplicate(self):
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.net/foo.pdf",
+                           body="foo")
+        rg = ResourceGrabber("http://foo.net/foo.pdf")
+        with open(os.path.join(self.directory, 'foo.pdf'), 'wb') as f:
+            f.write('foo')
+        self.assertEqual(rg.download(self.directory, duplicate_check=True), None)
 
     def test_generate_filename_from_model(self):
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.net/foo.pdf")
@@ -183,7 +191,7 @@ class ResourceGrabberInnerResourcesTest(unittest.TestCase):
                                body=self._read_file('page2.html'))
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page3.html",
                                body=self._read_file('notfound.html'), status=404)
-        # these are resourced inside pages defined above
+        # these are resources inside pages defined above
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text1.txt",
                                body=self._read_file('text1.txt'))
         HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text2.txt",

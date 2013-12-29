@@ -4,8 +4,8 @@ import sys, os
 setup(name='Allanon',
       # scripts=['src/allanon',],
       version=open(os.path.join("src", "allanon", "version.txt")).read(),
-      description="A crawler for visit a predictable set of URLs, "
-                  "and download resources from them",
+      description="A Web crawler that visit a predictable set of URLs, "
+                  "and automatically download resources you want from them",
       long_description=open("README.rst").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       classifiers=["Development Status :: 3 - Alpha",

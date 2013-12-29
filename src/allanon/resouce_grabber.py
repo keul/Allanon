@@ -1,6 +1,8 @@
 # -*- coding: utf8 -*-
 
 import re
+import hashlib
+import tempfile
 import os.path
 import urllib
 from urlparse import urlparse
@@ -122,12 +124,25 @@ class ResourceGrabber(object):
         return filename
 
     def download(self, directory, filename_model=None, ids=[], index=0,
-                 ids_digit_len=[], index_digit_len=0):
+                 ids_digit_len=[], index_digit_len=0, duplicate_check=False):
         self._open()
         filename = self._get_filename(filename_model=filename_model, ids=ids, index=index,
                                       ids_digit_len=ids_digit_len,
                                       index_digit_len=index_digit_len)
         path = os.path.join(directory, filename)
+        if duplicate_check and os.path.exists(path):
+            # Before trying to find a free filename, check is this file is a duplicate
+            with open(path, 'rb') as saved:
+                md5_saved = hashlib.md5(saved.read()).digest()
+            with tempfile.TemporaryFile() as tmp:
+                tmp.write(self.request.content)
+                tmp.seek(0)
+                md5_remote = hashlib.md5(tmp.read()).digest()
+            if md5_saved==md5_remote:
+                # same file
+                print "Resource at %s is a duplicate of %s" % (self.url,
+                                                              path)
+                return
         while os.path.exists(path):
             # continue trying until we get a good filename
             filename = _try_new_filename(filename)
@@ -136,6 +151,7 @@ class ResourceGrabber(object):
             with open(path, 'wb') as f:
                 print "Writing resource to %s" % path
                 f.write(self.request.content)
+            return path
 
     def download_resources(self, query, directory, filename_model=None, ids=[], index=0,
                            ids_digit_len=[], index_digit_len=0):

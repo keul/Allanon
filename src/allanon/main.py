@@ -51,7 +51,7 @@ parser.add_option('--search', '-s', dest="search_queries", default=[], action="a
 parser.add_option('--directory', '-d', dest="destination_directory", default=os.getcwd(),
                   metavar="TARGET_DIR",
                   help="Directory where to store all resources that will be downloaded.\n"
-                       "Default if the current directory")
+                       "Default is the current directory")
 parser.add_option('--filename', '-f', dest="filename_model", default=None, metavar="FILENAME",
                   help="Download resources with a custom, dynamic, filename.\n"
                        "You can use some marker for creating a dynamic content.\n"
@@ -65,6 +65,10 @@ parser.add_option('--filename', '-f', dest="filename_model", default=None, metav
                        "Use %EXTENSION for include the original file extensions.\n"
                        "Use %FULLNAME for include the original filename (with extension)\n"
                        "Default is \"%FULLNAME\"")
+parser.add_option("--check-duplicate", action="store_true", dest="duplicate_check", default=False,
+                  help="When finding a duplicate filename, check if both files are duplicate. "
+                       "In this case, do not save the second file. Default action is to keep all "
+                       "resources handling filename collision.")
 parser.add_option('--user-agent', dest="user_agent", default=None, metavar="USER_AGENT",
                   help="Change the User-Agent header sent with every request.\n"
                        "Default is \"Allanon Crawler <version number>\".")
@@ -109,7 +113,8 @@ def main(options=None, *args):
             rg = ResourceGrabber(url)
             rg.download(options.destination_directory, options.filename_model, ids, index+1,
                         ids_digit_len=max_ids,
-                        index_digit_len=index_digit_len)
+                        index_digit_len=index_digit_len,
+                        duplicate_check=options.duplicate_check)
     except KeyboardInterrupt:
         print "\nTerminated by user action"
         sys.exit(1)
