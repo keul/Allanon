@@ -80,6 +80,25 @@ class AllanonTest(unittest.TestCase):
         self.assertTrue(self._same_content('3-foo2.pdf', 'text2.txt'))
         self.assertTrue(self._same_content('4-foo2.pdf', 'text2.txt'))
 
+    def dynamic_directory_generation_test(self):
+        self.options.destination_directory = os.path.join(self.temp_dir, "%HOST/series-%1")
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.org/bar-1/file.pdf",
+                               body=self._read_file('text1.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.org/bar-2/file.pdf",
+                               body=self._read_file('text1.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://baz.net/bar-1/file.pdf",
+                               body=self._read_file('text1.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://baz.net/bar-2/file.pdf",
+                               body=self._read_file('text1.txt'))
+        main(self.options, 'http://foo.org/bar-{1:2}/file.pdf', 'http://baz.net/bar-{1:2}/file.pdf')
+        self.assertEqual(self._get_downloaded_files(), ['baz.net', 'foo.org'])
+        self.assertEqual(listdir(os.path.join(self.temp_dir, 'baz.net')), ['series-1', 'series-2'])
+        self.assertEqual(listdir(os.path.join(self.temp_dir, 'foo.org')), ['series-1', 'series-2'])
+        self.assertTrue(self._same_content('foo.org/series-1/file.pdf', 'text1.txt'))
+        self.assertTrue(self._same_content('foo.org/series-2/file.pdf', 'text1.txt'))
+        self.assertTrue(self._same_content('baz.net/series-1/file.pdf', 'text1.txt'))
+        self.assertTrue(self._same_content('baz.net/series-2/file.pdf', 'text1.txt'))
+
     # Step 2: really useful features
     def inner_resources_download_test(self):
         # main command line URLs set

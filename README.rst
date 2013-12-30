@@ -123,19 +123,21 @@ Filters are applied in the given order, so:
 
 Potentially you can continue this way, providing a third level of filters, and so on.
 
-Naming downloaded resources
----------------------------
+Naming and storing downloaded resources
+---------------------------------------
 
-Allanon download all files in the current directory (or in the directory specified using the
-``--directory`` option) so a filename conflict is possible.
-
-Instead of downloading resources "as is", you can change dynamically the filename using the
-``--filename`` option.
+Allanon download all files in the current directory so a filename conflict is possible.
+You can control how/where download changing dynamically the filename using the
+``--filename`` option and/or change the directory where to store files with the
+``--directory`` option.
 
 An example::
 
     $ allanon --filename="%HOST-%INDEX-section%1-version%3-%FULLNAME" \
     > "http://foo.org/pdf-repo-{1:10}/file{1:50}.pdf?version={0:3}"
+
+As you seen ``--filename`` accept some *markers* that can be used to better organize
+resources:
 
 ``%HOST``
     Will be replaced with the hostname used in the URL.
@@ -152,6 +154,18 @@ An example::
     
     You can also use the ``%NAME`` and ``%EXTENSION`` to get only the name of the file
     (without extension) or simply the extension.
+
+The ``--directory`` option can be a simple directory name or a directory path (in unix-like
+format, for example "``foo/bar/baz``").
+
+An example::
+
+    $ allanon --directory="/home/keul/%HOST/%1" \
+    > "http://foo.org/pdf-repo-{1:10}/file{1:50}.pdf" \
+    > "http://baz.net/pdf-repo-{1:10}/file{1:50}.pdf"
+
+Also the ``--directory`` option supports some of the markers: you can use ``%HOST``, ``%INDEX`` and ``%X``
+with the same meaning given above.
 
 TODO
 ====

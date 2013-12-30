@@ -53,11 +53,19 @@ parser.add_option('--directory', '-d', dest="destination_directory", default=os.
                   help="Directory where to store all resources that will be downloaded.\n"
                        "Default is the current directory.\n"
                        "Can be also a directory path string in nix format (like \"foo/bar\"), "
-                       "in that case all intermediate directories will be created.")
+                       "in that case all intermediate directories will be created.\n"
+                       "You can use some markers for creating a dynamic name.\n"
+                       "Use %x (%1, %2, ...) to include the current URLs range "
+                       "(if any). Use %1 for the first range in the URL, %2 for "
+                       "the second, and so on.\n"
+                       "Use %HOST for include the original host where the resource has "
+                       "been downloaded.\n"
+                       "Use %INDEX for include a progressive number of downloaded resources.\n"
+                       )
 parser.add_option('--filename', '-f', dest="filename_model", default=None, metavar="FILENAME",
                   help="Download resources with a custom, dynamic, filename.\n"
-                       "You can use some marker for creating a dynamic content.\n"
-                       "Use %x (%1, %2, ...) for include the current URLs range "
+                       "You can use some markers for creating a dynamic name.\n"
+                       "Use %x (%1, %2, ...) to include the current URLs range "
                        "(if any). Use %1 for the first range in the URL, %2 for "
                        "the second, and so on.\n"
                        "Use %HOST for include the original host where the resource has "
@@ -65,7 +73,7 @@ parser.add_option('--filename', '-f', dest="filename_model", default=None, metav
                        "Use %INDEX for include a progressive number of downloaded resources.\n"
                        "Use %NAME for include the original filename (without extension).\n"
                        "Use %EXTENSION for include the original file extensions.\n"
-                       "Use %FULLNAME for include the original filename (with extension)\n"
+                       "Use %FULLNAME for include the original filename (with extension).\n"
                        "Default is \"%FULLNAME\"")
 parser.add_option("--check-duplicate", action="store_true", dest="duplicate_check", default=False,
                   help="When finding a duplicate filename check they are duplicates. "
@@ -73,7 +81,7 @@ parser.add_option("--check-duplicate", action="store_true", dest="duplicate_chec
                        "resources handling filename collision, without checking files content.")
 parser.add_option('--user-agent', dest="user_agent", default=None, metavar="USER_AGENT",
                   help="Change the User-Agent header sent with every request.\n"
-                       "Default is \"Allanon Crawler <version number>\".")
+                       "Default is \"Allanon Crawler %s\"." % VERSION)
 
 
 def main(options=None, *args):
@@ -88,6 +96,7 @@ def main(options=None, *args):
         result.append(parser.get_usage())
         result.append(DESCRIPTION+"\n")
         result.append(parser.format_option_help(parser.formatter))
+        result.append('By Luca Fabbri - luca<at>keul.it\n')
         result.append('See https://github.com/keul/Allanon for detailed documentation or '
                       'provide bug report.')
         print "\n".join(result)

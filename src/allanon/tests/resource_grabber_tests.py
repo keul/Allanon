@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 
 from tempfile import mkdtemp
-import os
 import os.path
 
 import unittest
@@ -33,6 +32,12 @@ class ResourceGrabberTest(unittest.TestCase):
         self.assertEqual(rg._create_subdirs(os.path.join(self.directory, 'foo/bar/baz')),
                          os.path.join(self.directory, 'foo', 'bar', 'baz'))
 
+    def test_create_dirs_with_interpolation(self):
+        rg = ResourceGrabber('http://foo.com/part{1:4}/section-{10:20}/foo.pdf')
+        result = rg._create_subdirs(os.path.join(self.directory, '%HOST/section-%1/%2'),
+                                    ids=[2, 3], index=2,
+                                    ids_digit_len=[1, 1], index_digit_len=1)
+        self.assertEqual(result, os.path.join(self.directory, 'foo.com', 'section-2', '3'))
 
 class ResourceGrabberDirectDownloadTest(unittest.TestCase):
     

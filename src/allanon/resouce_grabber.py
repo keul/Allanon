@@ -93,25 +93,29 @@ class ResourceGrabber(object):
                                                           ids_digit_len=ids_digit_len,
                                                           index_digit_len=index_digit_len)
         return filename
-        
-    def _generate_filename_from_model(self, original, filename_model, ids=[], index=0,
-                                      ids_digit_len=[], index_digit_len=0):
-        filename = filename_model
+    
+    def _string_interpolation(self, model, ids=[], index=0,
+                              ids_digit_len=[], index_digit_len=0):
         # replace %x with proper ids
         cnt = 0
-        while dynaid_re.search(filename):
-            match = dynaid_re.search(filename)
+        while dynaid_re.search(model):
+            match = dynaid_re.search(model)
             dynaid = match.group()
-            filename = filename.replace(dynaid,
-                                        _int_format(ids[cnt],
-                                                    ids_digit_len[cnt]), 1)
+            model = model.replace(dynaid, _int_format(ids[cnt],
+                                                      ids_digit_len[cnt]), 1)
             cnt+=1
         # replace %INDEX with the progressive
-        if filename.find("%INDEX")>-1:
-            filename = filename.replace("%INDEX", _int_format(index, index_digit_len))
+        if model.find("%INDEX")>-1:
+            model = model.replace("%INDEX", _int_format(index, index_digit_len))
         # replace %HOST with current host
-        if filename.find("%HOST")>-1:
-            filename = filename.replace("%HOST", self.url_info.hostname)
+        if model.find("%HOST")>-1:
+            model = model.replace("%HOST", self.url_info.hostname)
+        return model
+    
+    def _generate_filename_from_model(self, original, filename_model, ids=[], index=0,
+                                      ids_digit_len=[], index_digit_len=0):
+        filename = self._string_interpolation(filename_model, ids, index, ids_digit_len, index_digit_len)
+        # *** Other interpolation (only file specific) ***
         # replace %NAME with original filename
         if filename.find("%NAME")>-1:
             filename = filename.replace("%NAME", original[:original.rfind('.')])
@@ -123,11 +127,13 @@ class ResourceGrabber(object):
             filename = filename.replace("%FULLNAME", original)
         return filename
 
-    def _create_subdirs(self, directory):
+    def _create_subdirs(self, directory, ids=[], index=0,
+                      ids_digit_len=[], index_digit_len=0):
         """Given a directory name, or a directory path string in nix format
         (e.g: foo/bar), create all intermediate directories.
         Return the new (existing) final directory absolute path 
         """
+        directory = self._string_interpolation(directory, ids, index, ids_digit_len, index_digit_len)
         if not os.path.exists(directory):
             os.makedirs(directory)
         return directory
@@ -136,10 +142,12 @@ class ResourceGrabber(object):
                  ids_digit_len=[], index_digit_len=0, duplicate_check=False):
         """Download a remote resource. Return the new path or None if no resource has been created"""
         self._open()
+        directory = self._create_subdirs(directory, ids=ids, index=index,
+                                      ids_digit_len=ids_digit_len,
+                                      index_digit_len=index_digit_len)
         filename = self._get_filename(filename_model=filename_model, ids=ids, index=index,
                                       ids_digit_len=ids_digit_len,
                                       index_digit_len=index_digit_len)
-        directory = self._create_subdirs(directory)
         path = os.path.join(directory, filename)
         if duplicate_check and os.path.exists(path):
             # Before trying to find a free filename, check is this file is a duplicate
