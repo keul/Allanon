@@ -11,6 +11,7 @@ Changelog
   through ``--user-agent`` option)
 - The ``--directory`` option can be a path and so create
   intermediate directories, and accept markers
+- More efficient memory usage
 
 0.1 (2013-01-05)
 ----------------

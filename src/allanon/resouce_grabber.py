@@ -61,7 +61,7 @@ class ResourceGrabber(object):
     def _open(self):
         if self.request is None:
             print "Getting %s" % self.url
-            self.request = requests.get(self.url, headers=config.headers())
+            self.request = requests.get(self.url, headers=config.headers(), stream=True)
             if self.request.status_code>=200 and self.request.status_code<300:
                 print "Done"
             else:
@@ -154,7 +154,8 @@ class ResourceGrabber(object):
             with open(path, 'rb') as saved:
                 md5_saved = hashlib.md5(saved.read()).digest()
             with tempfile.TemporaryFile() as tmp:
-                tmp.write(self.request.content)
+                for chunk in self.request.iter_content(config.CHUNK_SIZE):
+                    tmp.write(chunk)
                 tmp.seek(0)
                 md5_remote = hashlib.md5(tmp.read()).digest()
             if md5_saved==md5_remote:
@@ -169,7 +170,8 @@ class ResourceGrabber(object):
         if self.request.status_code>=200 and self.request.status_code<300:
             with open(path, 'wb') as f:
                 print "Writing resource to %s" % path
-                f.write(self.request.content)
+                for chunk in self.request.iter_content(config.CHUNK_SIZE):
+                    f.write(chunk)
             return path
 
     def download_resources(self, query, directory, filename_model=None, ids=[], index=0,
