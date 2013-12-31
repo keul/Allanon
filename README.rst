@@ -23,10 +23,10 @@ Every page contains some HTML code like the following::
 Let say this is the URL for the episode 4 of the fifth season of your program.
 You know that this program has 6 seasons with 22 episode each.
 
-As said before: this site is very slow so you probably want to download the movies in background
+As said before: this site is very slow so you prefer downloading episodes in background
 then watch them later.
 
-To download the movies you need also to watch the HTML inside the page and get some resources
+To download them you need to watch the HTML inside the page and get some resources
 (commonly: and FLV file).
 The best would be download *all* episode in a single (long running) operation instead of manually
 doing it.
@@ -74,13 +74,13 @@ Basic usage (you probably don't need Allanon at all for this)
 
 The ``allanon`` script accept an URL (or a list of URLs) to be downloaded::
 
-    $ allanon "http://myhost/folder/image1.jpg" "http://myhost/folder/image2.jpg" ...
+    $ allanon http://myhost/folder/image1.jpg http://myhost/folder/image2.jpg ...
 
 Every command line URL given to Allanon can be a simple URL or an *URL model* like the following::
 
     $ allanon "http://myhost/folder/image{1:50}.jpg"
 
-This will crawl 50 different URL automatically. 
+This will crawl 50 different URLs automatically. 
 
 Main usage (things became interesting now)
 ------------------------------------------
@@ -89,12 +89,12 @@ The ``allanon`` script take an additional ``--search`` parameter (see the first 
 above).
 When you provide it, you are meaning:
 
-    "*I don't want to download the given URL, but this/those URL contain link to
+    "*I don't want to download those URLs directly, but those URLs contain links to
     file that I really want*".
 
 The search parameter format must be CSS 3 compatible, like the one supported the famous
 `jQuery library`__, and it's based onto the `pyquery`__ library.
-Se it's documentation for more details about what you can look for.
+See it's documentation for more details about what you can look for.
 
 __ http://api.jquery.com/category/selectors/
 __ http://packages.python.org/pyquery/
@@ -110,24 +110,25 @@ The ``--search`` parameter can be provided multiple times::
 
 When you provide (for example) two different search parameters, you are meaning:
 
-    "*I don't want to download the given URL. This/those URL contains links to secondary pages,
-    and inside those pages there are links to resources I want to download*"
+    "*I don't want to download resources at given URLs. Those URLs contain links to secondary pages,
+    and inside those pages there're links to resources I want to download*"
 
 Filters are applied in the given order, so:
 
 * Allanon will search inside 30 pages named *category1.html*, *category2.html*, ...
 * inside those pages, Allanon will look for all links inside ``ul`` tags with CSS class
-  *image-repos* and recursively search inside them
-* inside those pages, Allanon will looks for images inside ``div`` with class *image-containers*
-* images will be downloaded
+  *image-repos* and recursively crawl them.
+* inside those pages, Allanon will looks for images inside ``div`` with class *image-containers*.
+* images will be downloaded.
 
 Potentially you can continue this way, providing a third level of filters, and so on.
 
 Naming and storing downloaded resources
 ---------------------------------------
 
-Allanon download all files in the current directory so a filename conflict is possible.
-You can control how/where download changing dynamically the filename using the
+By default Allanon download all files in the current directory so a filename conflict
+is possible.
+You can control how/where download, changing dynamically the filename using the
 ``--filename`` option and/or change the directory where to store files with the
 ``--directory`` option.
 
