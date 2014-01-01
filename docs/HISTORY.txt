@@ -14,6 +14,8 @@ Changelog
 - More efficient memory usage
 - Show progress bar when getting resources
   (now requires `progress`__)
+- Fixed problem when getting quoted filename from response
+  header
 
 __ https://pypi.python.org/pypi/progress
 

@@ -14,7 +14,7 @@ from progress.spinner import PieSpinner
 from allanon import config
 from allanon.html_crawler import search_in_html
 
-CONTENT_DISPOSITION_MODEL = r"""^.*filename\s*=\s*(?P<filename>.*?);?$"""
+CONTENT_DISPOSITION_MODEL = r"""^.*filename\s*="?\s*(?P<filename>.*?)"?;?$"""
 cdre = re.compile(CONTENT_DISPOSITION_MODEL, re.IGNORECASE)
 
 DYNA_ID_MODEL = r"""(\%\d+)"""
