@@ -39,7 +39,7 @@ You simply need to provide it:
 
 Quick example (you can keep it single lined)::
 
-    $ allanon --search "#movie-container embed" \
+    $ allanon --search="#movie-container embed" \
     > "http://legal-streaming-site.org/program-name/season{1:6}/episode{1:22}"
 
 Documentation
@@ -104,8 +104,8 @@ Extreme usage (uncommon, but possible)
 
 The ``--search`` parameter can be provided multiple times::
 
-    $ allanon --search "ul.image-repos a" \
-    > --search "div.image-containers img" \ 
+    $ allanon --search="ul.image-repos a" \
+    > --search="div.image-containers img" \
     > "http://image-repository-sites.org/category{1:30}.html"
 
 When you provide (for example) two different search parameters, you are meaning:
@@ -181,7 +181,7 @@ are missing:
 
 __ https://github.com/kennethreitz/grequests
 
-If you find other bug or want to ask for a missing feature, use the `product issue tracker`__.
+If you find other bugs or want to ask for missing features, use the `product's issue tracker`__.
 
 __ https://github.com/keul/Allanon/issues
 
