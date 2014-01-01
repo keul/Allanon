@@ -3,8 +3,11 @@
 import re
 import hashlib
 import tempfile
+import sys
 import os.path
+import traceback
 import urllib
+from shutil import copyfile
 from urlparse import urlparse
 
 import requests
@@ -140,6 +143,26 @@ class ResourceGrabber(object):
             os.makedirs(directory)
         return directory
 
+    def _get_resource_content(self, file_out, filename):
+        """Save data stored in the current request object in a file"""
+        content_length = self.request.headers.get('content-length', '')
+        size = int(content_length) if content_length else 0
+        if size:
+            progress = Bar("Getting %s" % filename, fill='#', suffix='%(percent)d%%', max=size)
+        else:
+            progress = PieSpinner("Getting %s " % filename)
+        try:
+            for chunk in self.request.iter_content(config.CHUNK_SIZE):
+                file_out.write(chunk)
+                progress.next(config.CHUNK_SIZE if size else 1)
+        except:
+            print "Error while getting %s" % self.url
+            traceback.print_exc(file=sys.stdout)
+            return None
+        finally:
+            progress.finish()
+        return file_out.name
+
     def download(self, directory, filename_model=None, ids=[], index=0,
                  ids_digit_len=[], index_digit_len=0, duplicate_check=False):
         """Download a remote resource. Return the new path or None if no resource has been created"""
@@ -151,21 +174,13 @@ class ResourceGrabber(object):
                                       ids_digit_len=ids_digit_len,
                                       index_digit_len=index_digit_len)
         path = os.path.join(directory, filename)
+        cache = None
         if duplicate_check and os.path.exists(path):
             # Before trying to find a free filename, check is this file is a duplicate
             with open(path, 'rb') as saved:
                 md5_saved = hashlib.md5(saved.read()).digest()
-            with tempfile.TemporaryFile() as tmp:
-                content_length = self.request.headers.get('content-length', '')
-                size = int(content_length) if content_length else 0
-                if size:
-                    progress = Bar("Getting %s" % filename, fill='#', suffix='%(percent)d%%', max=size)
-                else:
-                    progress = PieSpinner("Getting %s " % filename)
-                for chunk in self.request.iter_content(config.CHUNK_SIZE):
-                    tmp.write(chunk)
-                    progress.next(config.CHUNK_SIZE if size else 1)
-                progress.finish()
+            with tempfile.NamedTemporaryFile(delete=False) as tmp:
+                cache = self._get_resource_content(tmp, filename)
                 tmp.seek(0)
                 md5_remote = hashlib.md5(tmp.read()).digest()
             if md5_saved==md5_remote:
@@ -178,18 +193,14 @@ class ResourceGrabber(object):
             filename = _try_new_filename(filename)
             path = os.path.join(directory, filename)
         if self.request.status_code>=200 and self.request.status_code<300:
-            with open(path, 'wb') as f:
-                print "Writing resource to %s" % path
-                content_length = self.request.headers.get('content-length', '')
-                size = int(content_length) if content_length else 0
-                if size:
-                    progress = Bar("Getting %s" % filename, fill='#', suffix='%(percent)d%%', max=size)
-                else:
-                    progress = PieSpinner("Getting %s " % filename)
-                for chunk in self.request.iter_content(config.CHUNK_SIZE):
-                    f.write(chunk)
-                    progress.next(config.CHUNK_SIZE if size else 1)
-                progress.finish()
+            if cache:
+                # re-use file in temp directory, used for md5 checksum
+                copyfile(cache, path)
+                os.remove(cache)
+            else:
+                with open(path, 'wb') as f:
+                    print "Writing resource to %s" % path
+                    self._get_resource_content(f, filename)
             return path
 
     def download_resources(self, query, directory, filename_model=None, ids=[], index=0,
