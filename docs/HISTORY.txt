@@ -12,6 +12,10 @@ Changelog
 - The ``--directory`` option can be a path and so create
   intermediate directories, and accept markers
 - More efficient memory usage
+- Show progress bar when getting resources
+  (now requires `progress`__)
+
+__ https://pypi.python.org/pypi/progress
 
 0.1 (2013-01-05)
 ----------------

@@ -8,6 +8,8 @@ import urllib
 from urlparse import urlparse
 
 import requests
+from progress.bar import Bar
+from progress.spinner import PieSpinner
 
 from allanon import config
 from allanon.html_crawler import search_in_html
@@ -115,7 +117,7 @@ class ResourceGrabber(object):
     def _generate_filename_from_model(self, original, filename_model, ids=[], index=0,
                                       ids_digit_len=[], index_digit_len=0):
         filename = self._string_interpolation(filename_model, ids, index, ids_digit_len, index_digit_len)
-        # *** Other interpolation (only file specific) ***
+        # *** Other interpolation (only file's specific) ***
         # replace %NAME with original filename
         if filename.find("%NAME")>-1:
             filename = filename.replace("%NAME", original[:original.rfind('.')])
@@ -154,8 +156,16 @@ class ResourceGrabber(object):
             with open(path, 'rb') as saved:
                 md5_saved = hashlib.md5(saved.read()).digest()
             with tempfile.TemporaryFile() as tmp:
+                content_length = self.request.headers.get('content-length', '')
+                size = int(content_length) if content_length else 0
+                if size:
+                    progress = Bar("Getting %s" % filename, fill='#', suffix='%(percent)d%%', max=size)
+                else:
+                    progress = PieSpinner("Getting %s " % filename)
                 for chunk in self.request.iter_content(config.CHUNK_SIZE):
                     tmp.write(chunk)
+                    progress.next(config.CHUNK_SIZE if size else 1)
+                progress.finish()
                 tmp.seek(0)
                 md5_remote = hashlib.md5(tmp.read()).digest()
             if md5_saved==md5_remote:
@@ -170,8 +180,16 @@ class ResourceGrabber(object):
         if self.request.status_code>=200 and self.request.status_code<300:
             with open(path, 'wb') as f:
                 print "Writing resource to %s" % path
+                content_length = self.request.headers.get('content-length', '')
+                size = int(content_length) if content_length else 0
+                if size:
+                    progress = Bar("Getting %s" % filename, fill='#', suffix='%(percent)d%%', max=size)
+                else:
+                    progress = PieSpinner("Getting %s " % filename)
                 for chunk in self.request.iter_content(config.CHUNK_SIZE):
                     f.write(chunk)
+                    progress.next(config.CHUNK_SIZE if size else 1)
+                progress.finish()
             return path
 
     def download_resources(self, query, directory, filename_model=None, ids=[], index=0,
