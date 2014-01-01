@@ -177,6 +177,9 @@ are missing:
 * verbosity controls
 * handle timeout and sleep time after each download
 * bandwith control
+* multi-thread (let's look at `grequests`__)
+
+__ https://github.com/kennethreitz/grequests
 
 If you find other bug or want to ask for a missing feature, use the `product issue tracker`__.
 
