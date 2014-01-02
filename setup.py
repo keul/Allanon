@@ -3,7 +3,7 @@ import sys, os
 
 setup(name='Allanon',
       # scripts=['src/allanon',],
-      version=open(os.path.join("src", "allanon", "version.txt")).read(),
+      version=open(os.path.join("src", "allanon", "version.txt")).read().strip(),
       description="A Web crawler that visit a predictable set of URLs, "
                   "and automatically download resources you want from them",
       long_description=open("README.rst").read() + "\n" +
