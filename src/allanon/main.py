@@ -11,7 +11,7 @@ from allanon.url_generator import get_dynamic_urls
 from allanon.url_generator import search_resources
 from allanon.resouce_grabber import ResourceGrabber
 
-VERSION = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "version.txt")).read()
+VERSION = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "version.txt")).read().strip()
 DESCRIPTION = """
 Crawl a replicable set of URLs, then download resources from them.
 
