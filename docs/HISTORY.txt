@@ -16,6 +16,8 @@ Changelog
   (now requires `progress`__)
 - Fixed problem when getting quoted filename from response
   header
+- Added the ``--timeout`` option
+- Added the ``--sleep`` option
 
 __ https://pypi.python.org/pypi/progress
 

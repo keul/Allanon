@@ -99,8 +99,8 @@ See it's documentation for more details about what you can look for.
 __ http://api.jquery.com/category/selectors/
 __ http://packages.python.org/pyquery/
 
-Extreme usage (uncommon, but possible)
---------------------------------------
+Extreme usage
+-------------
 
 The ``--search`` parameter can be provided multiple times::
 
@@ -175,7 +175,6 @@ This utility is in alpha stage, a lot of thing can goes wrong when downloading a
 are missing:
 
 * verbosity controls
-* handle timeout and sleep time after each download
 * bandwidth control
 * multi-thread (let's look at `grequests`__)
 

@@ -7,6 +7,7 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "version.txt"
     version = version_file.read()
 
 CHUNK_SIZE = 10000
+TIMEOUT = 60.0
 USER_AGENT = "Allanon Crawler %s" % version
 
 def headers():

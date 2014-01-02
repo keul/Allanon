@@ -21,7 +21,9 @@ class AllanonTest(unittest.TestCase):
         self.temp_dir = mkdtemp()
         self.options.destination_directory = self.temp_dir
         self.options.user_agent = None
-        self.options.duplicate_check = False        
+        self.options.duplicate_check = False
+        self.options.timeout = 60
+        self.options.sleep = 0.0
         self.test_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
         HTTPretty.enable()
 
@@ -37,13 +39,13 @@ class AllanonTest(unittest.TestCase):
 
     def _same_content(self, temp_file, model_file):
         """
-        Return True is the temp_file in the temp directory has same content of the
+        Return True if the temp_file in the temp directory has same content of the
         file in the tests directory
         """
         with open(os.path.join(self.test_dir, model_file)) as original:
             with open(os.path.join(self.temp_dir, temp_file)) as downloaded:
                 return original.read() == downloaded.read()
-    
+
     # Step 1: useless features
     def simple_one_download_test(self):
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.org/main.html",
@@ -98,6 +100,22 @@ class AllanonTest(unittest.TestCase):
         self.assertTrue(self._same_content('foo.org/series-2/file.pdf', 'text1.txt'))
         self.assertTrue(self._same_content('baz.net/series-1/file.pdf', 'text1.txt'))
         self.assertTrue(self._same_content('baz.net/series-2/file.pdf', 'text1.txt'))
+
+    def test_duplicate_download(self):
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.org/foo.pdf",
+                               body=self._read_file('text1.txt'))
+        main(self.options, 'http://foo.org/foo.pdf', 'http://foo.org/foo.pdf')
+        self.assertEqual(listdir(self.temp_dir), ['foo.pdf', 'foo_1.pdf'])
+        with open(os.path.join(self.temp_dir, 'foo.pdf')) as f1:
+            with open(os.path.join(self.temp_dir, 'foo_1.pdf')) as f2:
+                self.assertEqual(f1.read(),f2.read())        
+
+    def test_duplicate_check_before_download(self):
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.org/foo.pdf",
+                               body=self._read_file('text1.txt'))
+        self.options.duplicate_check = True
+        main(self.options, 'http://foo.org/foo.pdf', 'http://foo.org/foo.pdf')
+        self.assertEqual(listdir(self.temp_dir), ['foo.pdf', ])
 
     # Step 2: really useful features
     def inner_resources_download_test(self):

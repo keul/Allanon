@@ -57,16 +57,22 @@ class ResourceGrabber(object):
         self.url = url
         self.url_info = urlparse(url)
         self.request = None
+        self.timeout = config.TIMEOUT
 
     @property
     def html(self):
         self._open()
-        return self.request.text
+        return self.request.text if self.request else None
 
     def _open(self):
         if self.request is None:
             print "Getting %s" % self.url
-            self.request = requests.get(self.url, headers=config.headers(), stream=True)
+            try:
+                self.request = requests.get(self.url, headers=config.headers(), stream=True,
+                                            timeout=self.timeout)
+            except requests.exceptions.Timeout:
+                print "Can't get resource at %s. Request timed out" % self.url
+                return
             if self.request.status_code>=200 and self.request.status_code<300:
                 print "Done"
             else:
@@ -167,6 +173,8 @@ class ResourceGrabber(object):
                  ids_digit_len=[], index_digit_len=0, duplicate_check=False):
         """Download a remote resource. Return the new path or None if no resource has been created"""
         self._open()
+        if not self.request:
+            return
         directory = self._create_subdirs(directory, ids=ids, index=index,
                                       ids_digit_len=ids_digit_len,
                                       index_digit_len=index_digit_len)
@@ -206,6 +214,8 @@ class ResourceGrabber(object):
     def download_resources(self, query, directory, filename_model=None, ids=[], index=0,
                            ids_digit_len=[], index_digit_len=0, duplicate_check=False):
         self._open()
+        if not self.request:
+            return
         resources = search_in_html(self.html, query, self.url)
         for url in resources:
             rg = ResourceGrabber(url)
@@ -214,8 +224,10 @@ class ResourceGrabber(object):
                         duplicate_check=duplicate_check)
 
     def get_internal_links(self, *args, **kwargs):
-        level = kwargs.get('level', 0)
         self._open()
+        if not self.request:
+            return
+        level = kwargs.get('level', 0)
         if self.request.status_code >=200 and self.request.status_code<300:
             links = search_in_html(self.html, args[level], self.url)
             for link in links:

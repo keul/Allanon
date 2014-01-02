@@ -2,8 +2,9 @@
 
 import sys
 import os.path
+import time
 
-from optparse import OptionParser
+from optparse import OptionParser, OptionGroup
 
 from allanon import config
 from allanon.url_generator import get_dynamic_urls
@@ -75,14 +76,26 @@ parser.add_option('--filename', '-f', dest="filename_model", default=None, metav
                        "Use %EXTENSION for include the original file extensions.\n"
                        "Use %FULLNAME for include the original filename (with extension).\n"
                        "Default is \"%FULLNAME\"")
-parser.add_option("--check-duplicate", action="store_true", dest="duplicate_check", default=False,
+parser.add_option("--check-duplicate", '-c', action="store_true", dest="duplicate_check", default=False,
                   help="When finding a duplicate filename check they are duplicates. "
                        "In this case, do not save the new file. Default action is to keep all "
                        "resources handling filename collision, without checking files content.")
-parser.add_option('--user-agent', dest="user_agent", default=None, metavar="USER_AGENT",
+
+group = OptionGroup(parser, "Request options",
+                            "This set of options control how Allanon connect to remote servers."
+                    )
+
+group.add_option('--user-agent', '-u', dest="user_agent", default=None, metavar="USER_AGENT",
                   help="Change the User-Agent header sent with every request.\n"
                        "Default is \"Allanon Crawler %s\"." % VERSION)
-
+group.add_option('--timeout', '-t', dest="timeout", default=60.0, type="float", 
+                  help="Number of seconds to wait for server response before giving up.\n"
+                        "Default is 60. Use 0 for disable timeout.")
+group.add_option('--sleep-time', dest="sleep", default=1.0, type="float", 
+                  help="Number of seconds to wait after each downloaded resource.\n"
+                       "Use this to not overload a server or being banned.\n"
+                       "Default is 1.")
+parser.add_option_group(group)
 
 def main(options=None, *args):
     if not options:
@@ -104,7 +117,11 @@ def main(options=None, *args):
     
     if options.user_agent:
         config.USER_AGENT = options.user_agent
-    
+    if options.timeout:
+        config.TIMEOUT = options.timeout
+    if options.sleep:
+        config.SLEEP_TIME = options.sleep
+
     # first, command line URLs sequence
     try:
         urls = get_dynamic_urls(args)
@@ -126,6 +143,7 @@ def main(options=None, *args):
                         ids_digit_len=max_ids,
                         index_digit_len=index_digit_len,
                         duplicate_check=options.duplicate_check)
+            time.sleep(options.sleep)
     except KeyboardInterrupt:
         print "\nTerminated by user action"
         sys.exit(1)
