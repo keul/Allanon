@@ -177,6 +177,7 @@ are missing:
 * verbosity controls
 * bandwidth control
 * multi-thread (let's look at `grequests`__)
+* Python 3
 
 __ https://github.com/kennethreitz/grequests
 

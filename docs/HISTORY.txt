@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.2 (unreleased)
+0.2 (2014-01-02)
 ----------------
 
 - Do not crawl or download when on error pages
