@@ -73,6 +73,16 @@ class ResourceGrabber(object):
             except requests.exceptions.Timeout:
                 print "Can't get resource at %s. Request timed out" % self.url
                 return
+            except KeyboardInterrupt:
+                choice = None
+                while choice not in ('s', 't'):
+                    choice = raw_input("\nYou want to: "
+                                       "[s]kip this resource or [t]terminate (default)? ").strip().lower()
+                    choice = choice if choice else 't'
+                if choice=='t':
+                    raise
+                print "Skipping"
+                return
             if self.request.status_code>=200 and self.request.status_code<300:
                 print "Done"
             else:
