@@ -24,6 +24,7 @@ class AllanonTest(unittest.TestCase):
         self.options.duplicate_check = False
         self.options.timeout = 60
         self.options.sleep = 0.0
+        self.options.offset = 0
         self.test_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
         HTTPretty.enable()
 
@@ -141,6 +142,30 @@ class AllanonTest(unittest.TestCase):
         self.assertEqual(self._get_downloaded_files(), ['1-1-page1.html', '2-1-page2.html',
                                                         '4-2-text1.txt', '5-2-text2.txt',
                                                         ])
+
+
+    def inner_resources_download_test_with_offset(self):
+        # main command line URLs set
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.org/section-1/download.html",
+                               body=self._read_file('page.html'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.org/section-2/download.html",
+                               body=self._read_file('page1.html'))
+        self.options.filename_model = "%INDEX-%FULLNAME"
+        self.options.search_queries = ['div.recursiveTest a']
+        self.options.offset = 2
+        # resources found inside main pages
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page1.html",
+                               body=self._read_file('text1.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page2.html",
+                               body=self._read_file('text2.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/page3.html",
+                               body=self._read_file('notfound.html'), status=404)
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text1.txt",
+                               body=self._read_file('text1.txt'))
+        HTTPretty.register_uri(HTTPretty.GET, "http://recursive.org/text2.txt",
+                               body=self._read_file('text2.txt'))
+        main(self.options, 'http://foo.org/section-{1:2}/download.html')
+        self.assertEqual(self._get_downloaded_files(), ['4-text1.txt', '5-text2.txt', ])
 
 
 if __name__ == "__main__":

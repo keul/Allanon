@@ -80,10 +80,13 @@ parser.add_option("--check-duplicate", '-c', action="store_true", dest="duplicat
                   help="When finding a duplicate filename check they are duplicates. "
                        "In this case, do not save the new file. Default action is to keep all "
                        "resources handling filename collision, without checking files content.")
+parser.add_option("--offset", '-o', type="int", dest="offset", default=0,
+                  help="Start download resources only after skipping first OFFSET found.\n"
+                       "This only affects resource that would be downloaded (not crawled).\n"
+                       "Default is: do not skip any resource.")
 
 group = OptionGroup(parser, "Request options",
-                            "This set of options control how Allanon connect to remote servers."
-                    )
+                            "This set of options control how Allanon connect to remote servers.")
 
 group.add_option('--user-agent', '-u', dest="user_agent", default=None, metavar="USER_AGENT",
                   help="Change the User-Agent header sent with every request.\n"
@@ -137,6 +140,9 @@ def main(options=None, *args):
             urls = search_resources(urls, options.search_queries)
 
         for index, urls_data in enumerate(urls):
+            if options.offset and (index+1)<=options.offset:
+                print "Skipping resource %d due to offset settings" % (index+1)
+                continue
             url, ids, max_ids = urls_data
             rg = ResourceGrabber(url)
             rg.download(options.destination_directory, options.filename_model, ids, index+1,

@@ -179,7 +179,7 @@ class ResourceGrabber(object):
             progress.finish()
         return file_out.name
 
-    def download(self, directory, filename_model=None, ids=[], index=0,
+    def download(self, directory, filename_model=None, ids=[], index=1,
                  ids_digit_len=[], index_digit_len=0, duplicate_check=False):
         """Download a remote resource. Return the new path or None if no resource has been created"""
         self._open()
@@ -203,8 +203,9 @@ class ResourceGrabber(object):
                 md5_remote = hashlib.md5(tmp.read()).digest()
             if md5_saved==md5_remote:
                 # same file
-                print "Resource at %s is a duplicate of %s" % (self.url,
-                                                               path)
+                print "%d - Resource at %s is a duplicate of %s" % (index,
+                                                                    self.url,
+                                                                    path)
                 return
         while os.path.exists(path):
             # continue trying until we get a good filename
@@ -217,11 +218,11 @@ class ResourceGrabber(object):
                 os.remove(cache)
             else:
                 with open(path, 'wb') as f:
-                    print "Writing resource to %s" % path
+                    print "%d - Writing resource to %s" % (index, path)
                     self._get_resource_content(f, filename)
             return path
 
-    def download_resources(self, query, directory, filename_model=None, ids=[], index=0,
+    def download_resources(self, query, directory, filename_model=None, ids=[], index=1,
                            ids_digit_len=[], index_digit_len=0, duplicate_check=False):
         self._open()
         if not self.request:
