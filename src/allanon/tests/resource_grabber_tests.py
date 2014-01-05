@@ -1,12 +1,10 @@
 # -*- coding: utf8 -*-
 
-from tempfile import mkdtemp
 import os.path
-
 import unittest
-
+from requests import exceptions as requests_exceptions
+from tempfile import mkdtemp
 from httpretty import HTTPretty
-
 from allanon.resouce_grabber import ResourceGrabber
 from allanon.resouce_grabber import _try_new_filename
 
@@ -14,8 +12,12 @@ from allanon.resouce_grabber import _try_new_filename
 class ResourceGrabberTest(unittest.TestCase):
     
     def setUp(self):
+        HTTPretty.enable()
         self.directory = mkdtemp()
     
+    def tearDown(self):
+        HTTPretty.disable()
+
     def test_create_subdirs(self):
         rg = ResourceGrabber('foo')
         self.assertEqual(rg._create_subdirs(os.path.join(self.directory, 'foo')),
@@ -38,6 +40,25 @@ class ResourceGrabberTest(unittest.TestCase):
                                     ids=[2, 3], index=2,
                                     ids_digit_len=[1, 1], index_digit_len=1)
         self.assertEqual(result, os.path.join(self.directory, 'foo.com', 'section-2', '3'))
+
+    def test_open_exceptions_timeout(self):
+        def timeout_callback(method, uri, headers):
+            raise requests_exceptions.Timeout()
+        rg = ResourceGrabber('http://foo.com/foo.pdf')
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.com/foo.pdf",
+                               body=timeout_callback)
+        e = rg._open()
+        self.assertTrue(isinstance(e, requests_exceptions.Timeout))
+
+    def test_open_exceptions_generic(self):
+        def timeout_callback(method, uri, headers):
+            raise requests_exceptions.RequestException()
+        rg = ResourceGrabber('http://foo.com/foo.pdf')
+        HTTPretty.register_uri(HTTPretty.GET, "http://foo.com/foo.pdf",
+                               body=timeout_callback)
+        e = rg._open()
+        self.assertTrue(isinstance(e, requests_exceptions.RequestException))
+
 
 class ResourceGrabberDirectDownloadTest(unittest.TestCase):
     

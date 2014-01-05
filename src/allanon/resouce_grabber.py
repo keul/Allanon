@@ -70,10 +70,14 @@ class ResourceGrabber(object):
             try:
                 self.request = requests.get(self.url, headers=config.headers(), stream=True,
                                             timeout=self.timeout)
-            except requests.exceptions.Timeout:
+            except requests.exceptions.Timeout as e:
                 print "Can't get resource at %s. Request timed out" % self.url
-                return
-            except KeyboardInterrupt:
+                return e
+            except requests.exceptions.RequestException as e:
+                print "Unknow error getting %s. Skipping..." % self.url
+                print e
+                return e
+            except KeyboardInterrupt as e:
                 choice = None
                 while choice not in ('s', 't'):
                     choice = raw_input("\nYou want to: "
@@ -82,7 +86,7 @@ class ResourceGrabber(object):
                 if choice=='t':
                     raise
                 print "Skipping"
-                return
+                return e
             if self.request.status_code>=200 and self.request.status_code<300:
                 print "Done"
             else:
