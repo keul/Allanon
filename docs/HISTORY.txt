@@ -7,7 +7,7 @@ Changelog
 - Performing a ``KeyboardInterrupt`` while connecting
   to a resource now ask for simply skipping that resource
 - Added the ``--offset`` option
-- Handle also other kind of connection/communication errors
+- Handle other kind of connection/communication errors
   without aborting the process
 
 0.2 (2014-01-02)

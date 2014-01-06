@@ -43,7 +43,7 @@ class ResourceGrabberTest(unittest.TestCase):
 
     def test_open_exceptions_timeout(self):
         def timeout_callback(method, uri, headers):
-            raise requests_exceptions.Timeout()
+            raise requests_exceptions.Timeout("Simulating timeout error")
         rg = ResourceGrabber('http://foo.com/foo.pdf')
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.com/foo.pdf",
                                body=timeout_callback)
@@ -52,7 +52,7 @@ class ResourceGrabberTest(unittest.TestCase):
 
     def test_open_exceptions_generic(self):
         def timeout_callback(method, uri, headers):
-            raise requests_exceptions.RequestException()
+            raise requests_exceptions.RequestException("Simulating generic error")
         rg = ResourceGrabber('http://foo.com/foo.pdf')
         HTTPretty.register_uri(HTTPretty.GET, "http://foo.com/foo.pdf",
                                body=timeout_callback)

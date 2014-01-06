@@ -75,7 +75,7 @@ class ResourceGrabber(object):
                 return e
             except requests.exceptions.RequestException as e:
                 print "Unknow error getting %s. Skipping..." % self.url
-                print e
+                traceback.print_exc(file=sys.stdout)
                 return e
             except KeyboardInterrupt as e:
                 choice = None
