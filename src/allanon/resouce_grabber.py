@@ -74,7 +74,7 @@ class ResourceGrabber(object):
                 print "Can't get resource at %s. Request timed out" % self.url
                 return e
             except requests.exceptions.RequestException as e:
-                print "Unknow error getting %s. Skipping..." % self.url
+                print "Unknown error getting %s. Skipping..." % self.url
                 traceback.print_exc(file=sys.stdout)
                 return e
             except KeyboardInterrupt as e:
