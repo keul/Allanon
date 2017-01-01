@@ -8,7 +8,7 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "version.txt"
 
 CHUNK_SIZE = 10000
 TIMEOUT = 60.0
-USER_AGENT = "Allanon Crawler %s" % version
+USER_AGENT = "Allanon Crawler %s" % version.strip()
 
 def headers():
     return {

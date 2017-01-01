@@ -9,6 +9,7 @@ Changelog
 - Added the ``--offset`` option
 - Handle other kind of connection/communication errors
   without aborting the process
+- Fixed an issue with default user agent on default configuration
 
 0.2 (2014-01-02)
 ----------------
