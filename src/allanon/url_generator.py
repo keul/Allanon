@@ -49,7 +49,7 @@ def generate_urls(url, level=0):
         start, end = match.groups()
         start = int(start); end = int(end)
         step = start<=end and 1 or -1
-        for x in xrange(start, end+step, step):
+        for x in range(start, end+step, step):
             ids = [x]
             max_ids = [len(str(max(start, end+step)))]
             new_url = spre.sub(str(x), url, 1)

@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from pyquery import PyQuery
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 def apply_base_url(url, base_url):
@@ -30,7 +30,7 @@ def search_in_html(html, query, base_url=''):
     pq = PyQuery(html)
     elements = pq(query)
     for element in elements:
-        if isinstance(element, basestring):
+        if isinstance(element, str):
             # BBB pyquery return "something" also when no elements are found... bah!
             continue 
         if element.tag=='img':
