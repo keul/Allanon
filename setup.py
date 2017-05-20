@@ -16,7 +16,7 @@ setup(name='Allanon',
                    "Topic :: System :: Shells",
                    "Topic :: Internet :: WWW/HTTP",
                    "Programming Language :: Python",
-                   "Programming Language :: Python :: 2.7",
+                   "Programming Language :: Python :: 3",
                    ], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='crawler robot spider downloader parser',
       author='keul',
