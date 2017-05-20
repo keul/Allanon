@@ -4,6 +4,8 @@ Changelog
 0.3 (unreleased)
 ----------------
 
+- Codebase migrated to Python 3
+  [ralic]
 - Performing a ``KeyboardInterrupt`` while connecting
   to a resource now ask for simply skipping that resource
 - Added the ``--offset`` option
