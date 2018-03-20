@@ -38,6 +38,7 @@ setup(name='Allanon',
           'pyquery',
           'requests>=1.0.0',
           'progress',
+          'throttle',
       ],
       entry_points={'console_scripts': ['allanon = allanon.main:main', ]}
       )

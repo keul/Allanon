@@ -98,7 +98,13 @@ group.add_option('--sleep-time', dest="sleep", default=1.0, type="float",
                   help="Number of seconds to wait after each downloaded resource.\n"
                        "Use this to not overload a server or being banned.\n"
                        "Default is 1.")
+group.add_option('--bandwidth', '-b', default=None, type="string", 
+                  help="Limit bandwidth when downloading resources.\n"
+                       "Value is in bytes-per-seconds, but you can provide a Kb or Mb suffix.\n"
+                       "Default is: no limit to bandwidth usage.\n")
+
 parser.add_option_group(group)
+
 
 def main(options=None, *args):
     if not options:

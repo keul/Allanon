@@ -175,10 +175,11 @@ This utility is in alpha stage, a lot of thing can goes wrong when downloading a
 are missing:
 
 * verbosity controls
-* bandwidth control
+* bandwidth control (think about using `urlgrabber`__ but it seems not very developed/documented)
 * multi-thread (let's look at `grequests`__)
 * Python 3
 
+__ http://urlgrabber.baseurl.org/
 __ https://github.com/kennethreitz/grequests
 
 If you find other bugs or want to ask for missing features, use the `product's issue tracker`__.
