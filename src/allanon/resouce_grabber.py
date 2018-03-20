@@ -66,15 +66,15 @@ class ResourceGrabber(object):
 
     def _open(self):
         if self.request is None:
-            print("Getting %s" % self.url)
+            print(("Getting %s" % self.url))
             try:
                 self.request = requests.get(self.url, headers=config.headers(), stream=True,
                                             timeout=self.timeout)
             except requests.exceptions.Timeout as e:
-                print("Can't get resource at %s. Request timed out" % self.url)
+                print(("Can't get resource at %s. Request timed out" % self.url))
                 return e
             except requests.exceptions.RequestException as e:
-                print("Unknown error getting %s. Skipping..." % self.url)
+                print(("Unknown error getting %s. Skipping..." % self.url))
                 traceback.print_exc(file=sys.stdout)
                 return e
             except KeyboardInterrupt as e:
@@ -90,8 +90,8 @@ class ResourceGrabber(object):
             if self.request.status_code>=200 and self.request.status_code<300:
                 print("Done")
             else:
-                print("Can't get resource at %s. HTTP error %d" % (self.url,
-                                                                   self.request.status_code))
+                print(("Can't get resource at %s. HTTP error %d" % (self.url,
+                                                                   self.request.status_code)))
     
     def _get_filename(self, filename_model=None, ids=[], index=0,
                       ids_digit_len=0, index_digit_len=0):
@@ -176,7 +176,7 @@ class ResourceGrabber(object):
                 file_out.write(chunk)
                 progress.next(config.CHUNK_SIZE if size else 1)
         except:
-            print("Error while getting %s" % self.url)
+            print(("Error while getting %s" % self.url))
             traceback.print_exc(file=sys.stdout)
             return None
         finally:
@@ -207,9 +207,9 @@ class ResourceGrabber(object):
                 md5_remote = hashlib.md5(tmp.read()).digest()
             if md5_saved==md5_remote:
                 # same file
-                print("%d - Resource at %s is a duplicate of %s" % (index,
+                print(("%d - Resource at %s is a duplicate of %s" % (index,
                                                                     self.url,
-                                                                    path))
+                                                                    path)))
                 return
         while os.path.exists(path):
             # continue trying until we get a good filename
@@ -222,7 +222,7 @@ class ResourceGrabber(object):
                 os.remove(cache)
             else:
                 with open(path, 'wb') as f:
-                    print("%d - Writing resource to %s" % (index, path))
+                    print(("%d - Writing resource to %s" % (index, path)))
                     self._get_resource_content(f, filename)
             return path
 

@@ -8,10 +8,11 @@ setup(name='Allanon',
                   "and automatically download resources you want from them",
       long_description=open("README.rst").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
-      classifiers=["Development Status :: 3 - Alpha",
+      classifiers=["Development Status :: 4 - Beta",
                    "License :: OSI Approved :: GNU General Public License (GPL)",
                    "Operating System :: OS Independent",
                    "Programming Language :: Python",
+                   "Programming Language :: Python :: 3",
                    "Topic :: Utilities",
                    "Topic :: System :: Shells",
                    "Topic :: Internet :: WWW/HTTP",
@@ -41,4 +42,3 @@ setup(name='Allanon',
       ],
       entry_points={'console_scripts': ['allanon = allanon.main:main', ]}
       )
-

@@ -115,7 +115,7 @@ def main(options=None, *args):
         result.append('By Luca Fabbri - luca<at>keul.it\n')
         result.append('See https://github.com/keul/Allanon for detailed documentation or '
                       'provide bug report.')
-        print("\n".join(result))
+        print(("\n".join(result)))
         sys.exit(0)
     
     if options.user_agent:
@@ -141,7 +141,7 @@ def main(options=None, *args):
 
         for index, urls_data in enumerate(urls):
             if options.offset and (index+1)<=options.offset:
-                print("Skipping resource %d due to offset settings" % (index+1))
+                print(("Skipping resource %d due to offset settings" % (index+1)))
                 continue
             url, ids, max_ids = urls_data
             rg = ResourceGrabber(url)
