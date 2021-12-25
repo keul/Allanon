@@ -1,0 +1,22 @@
+-e git+git@github.com:keul/Allanon.git@7ecc73cc6457cb11e4542a5c226a35b63b1b212a#egg=Allanon
+black==21.12b0
+certifi==2021.10.8
+charset-normalizer==2.0.9
+click==8.0.3
+cssselect==1.1.0
+httpretty==1.1.4
+idna==3.3
+importlib-metadata==4.10.0
+lxml==4.7.1
+mypy-extensions==0.4.3
+nose==1.3.7
+pathspec==0.9.0
+platformdirs==2.4.0
+progress==1.6
+pyquery==1.4.3
+requests==2.26.0
+tomli==1.2.3
+typed-ast==1.5.1
+typing-extensions==4.0.1
+urllib3==1.26.7
+zipp==3.6.0
