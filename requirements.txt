@@ -1,6 +1,6 @@
 -e git+git@github.com:keul/Allanon.git@7ecc73cc6457cb11e4542a5c226a35b63b1b212a#egg=Allanon
 black==21.12b0
-certifi==2021.10.8
+certifi==2022.12.7
 charset-normalizer==2.0.9
 click==8.0.3
 cssselect==1.1.0
